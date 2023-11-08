@@ -3,26 +3,26 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: './src/index.js',
-  
+
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "build"),
   },
 
   mode: 'development',
-  
+
   devtool: "source-map",
 
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
- 
+
   // настройки локального сервера
   devServer: {
-      static: path.resolve(__dirname, 'build'),
-      compress: true,
-      port: 3000,
-      open: true
+    static: path.resolve(__dirname, 'build'),
+    compress: true,
+    port: 3000,
+    open: true
   },
   module: {
     rules: [
@@ -38,8 +38,8 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
         exclude: /node_modules/,
+        use: 'ts-loader'
       },
     ],
   },
