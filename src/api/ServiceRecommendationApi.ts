@@ -18,7 +18,7 @@ export default class ServiceRecommendationApi {
       requestInit['body'] = JSON.stringify(body)
 
     // const res = await fetch(`http://localhost:8081/swagger-ui/index.html`, { mode: 'no-cors' })
-    const res = fetch(`http://${HOST_NAME}:${PORT}/hello`, requestInit)
+    const res = fetch(`http://${HOST_NAME}:${PORT}/${params}`, requestInit)
 
     return res
   }
