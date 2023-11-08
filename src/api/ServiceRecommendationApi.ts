@@ -25,6 +25,6 @@ export default class ServiceRecommendationApi {
 
   // test method
   hello() {
-    return this._request('GET', '/hello')
+    return this._request('GET', 'hello')
   }
 }
