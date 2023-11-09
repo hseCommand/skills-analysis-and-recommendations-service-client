@@ -27,6 +27,7 @@ module.exports = {
     open: true,
     hot: true
   },
+  
   module: {
     rules: [
       {
@@ -44,6 +45,15 @@ module.exports = {
         exclude: /node_modules/,
         use: 'ts-loader'
       },
+      {
+        test: /\.(le|c)ss$/,
+        use: [
+          // compiles Less to CSS
+          "style-loader",
+          "css-loader",
+          "less-loader",
+        ],
+      }
     ],
   },
 
