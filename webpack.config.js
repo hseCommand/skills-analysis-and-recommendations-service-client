@@ -20,9 +20,12 @@ module.exports = {
   // настройки локального сервера
   devServer: {
     static: path.resolve(__dirname, 'build'),
-    compress: true,
+    host: "0.0.0.0",
+    allowedHosts: 'all',
+    compress: false,
     port: 3000,
-    open: true
+    open: true,
+    hot: true
   },
   module: {
     rules: [

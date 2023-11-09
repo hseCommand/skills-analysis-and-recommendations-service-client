@@ -10,7 +10,7 @@ export default function App() {
       console.log(d);
 
       setDataFromApi(d.status)
-    })
+    }).catch(console.log)
   }, [])
 
   return (

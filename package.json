@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve",
     "build": "webpack --mode production",
     "start": "webpack serve --mode development",
     "clean": "rm -r dist"

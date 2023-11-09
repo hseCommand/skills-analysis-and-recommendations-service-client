@@ -1,6 +1,7 @@
 import { HOST_NAME, PORT } from "../utils/constants"
 
 export default class ServiceRecommendationApi {
+
   constructor() {
     this._request = this._request.bind(this)
   }
