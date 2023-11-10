@@ -1,31 +1,64 @@
-import { HOST_NAME, PORT } from "../utils/constants"
+// It's better to use environment variables for host and port
+const API_HOST_NAME = 'localhost';
+const API_PORT = '8081';
+
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export default class ServiceRecommendationApi {
+  private static instance: ServiceRecommendationApi;
 
-  constructor() {
-    this._request = this._request.bind(this)
+  private constructor() { }
+
+  // Singleton pattern
+  public static getInstance(): ServiceRecommendationApi {
+    if (!ServiceRecommendationApi.instance) {
+      ServiceRecommendationApi.instance = new ServiceRecommendationApi();
+    }
+    return ServiceRecommendationApi.instance;
   }
 
-  _request(method: string, params: string, body?: Object) {
-    const requestInit: any = {
+  private async _request(method: RequestMethod, params: string, body?: Object): Promise<Response> {
+    const requestInit: RequestInit = {
       method: method,
-      mode: 'no-cors',
+      // mode: 'no-cors',
       headers: {
-        "accept": "*/*",
+        "Accept": "application/json",
         'Content-Type': 'application/json'
       }
+    };
+
+    if (body) {
+      requestInit.body = JSON.stringify(body);
     }
-    if (body)
-      requestInit['body'] = JSON.stringify(body)
 
-    // const res = await fetch(`http://localhost:8081/swagger-ui/index.html`, { mode: 'no-cors' })
-    const res = fetch(`http://${HOST_NAME}:${PORT}/${params}`, requestInit)
+    try {
+      const response = await fetch(`http://${API_HOST_NAME}:${API_PORT}/${params}`, requestInit);
+      console.log('response', response);
 
-    return res
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response;
+    } catch (error) {
+      console.error("Fetch error: ", error);
+      throw error;
+    }
   }
 
-  // test method
-  hello() {
-    return this._request('GET', 'hello')
+  // Example method
+  public hello(): Promise<Response> {
+    return this._request('GET', 'hello');
+  }
+
+  public getSwagger(): Promise<Response> {
+    return this._request('GET', 'swagger-ui.html')
   }
 }
+
+// Usage
+// const api = ServiceRecommendationApi.getInstance();
+// api.hello().then(response => {
+//   // Handle response
+// }).catch(error => {
+//   // Handle error
+// });
