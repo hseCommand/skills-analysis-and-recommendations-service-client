@@ -35,7 +35,7 @@ export default function App() {
     <div>
       <h1>React {dataFromApi}</h1>
 
-      <Button title='test' onClick={handleClick}>
+      <Button onClick={handleClick}>
         {'get hello world from API'}
       </Button>
     </div>
