@@ -6,15 +6,13 @@ type IButtonProps = {
   title: string,
   disabled?: boolean,
   onClick: () => void,
-  children: any
+  children: React.ReactNode
 }
 
-export const Button: React.FC<IButtonProps> = (props): React.ReactElement => {
-  const { onClick, children } = props
+export const Button: React.FC<IButtonProps> = ({ title, onClick, children, disabled = false }): React.ReactElement => {
   return (
-    <button className={'button'} onClick={onClick}>
+    <button className="button" onClick={onClick} disabled={disabled} aria-label={title}>
       {children}
     </button>
-  )
-
+  );
 }
