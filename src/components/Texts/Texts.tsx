@@ -13,15 +13,20 @@ interface ITextProps {
   children: React.ReactNode
 }
 
-const TextConfigurableComponent: React.FC<ITextProps> = (props) => {
-  console.log(props)
-
-  return <div className={'text ' + props.className}>{props.children}</div>
-}
+const TextConfigurableComponent: React.FC<ITextProps> = (props) => (
+  <div className={'text ' + props.className}>{props.children}</div>
+)
 
 export const Header: React.FC<ITextProps> = (props) => {
   return (
     <TextConfigurableComponent className="header">
+      {props.children}
+    </TextConfigurableComponent>
+  )
+}
+export const Subtitle: React.FC<ITextProps> = (props) => {
+  return (
+    <TextConfigurableComponent className="subtitle">
       {props.children}
     </TextConfigurableComponent>
   )

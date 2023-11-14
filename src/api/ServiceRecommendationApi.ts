@@ -26,7 +26,7 @@ export default class ServiceRecommendationApi {
   ): Promise<Response> {
     const requestInit: RequestInit = {
       method: method,
-      // mode: 'no-cors',
+      mode: 'no-cors',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',

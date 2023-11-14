@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import ServiceRecommendationApi from './api/ServiceRecommendationApi'
 import { Button } from './components/Button/Button'
+import { Header } from './components/Texts/Texts'
 
 import './app.less'
-import { Header } from './components/Texts/Texts'
+import { Skill } from './components/Skill/Skill'
 
 export default function App() {
   const { t } = useTranslation()
-
   const [dataFromApi, setDataFromApi] = useState<any>()
   const apiService = ServiceRecommendationApi.getInstance()
 
@@ -33,7 +33,7 @@ export default function App() {
         <Header>
           {t('title')} {dataFromApi}
         </Header>
-
+        <Skill />
         <Button onClick={handleClick}>{t(`example-of-i18next-usage`)}</Button>
       </div>
     </Suspense>
