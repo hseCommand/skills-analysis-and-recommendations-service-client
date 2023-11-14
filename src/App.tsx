@@ -5,6 +5,7 @@ import ServiceRecommendationApi from './api/ServiceRecommendationApi'
 import { Button } from './components/Button/Button'
 
 import './app.less'
+import { Header } from './components/Texts/Texts'
 
 export default function App() {
   const { t } = useTranslation()
@@ -23,18 +24,15 @@ export default function App() {
     }
   }
   const handleClick = () => {
-    // api.hello().then((d: Response) => {
-    //   setDataFromApi(d.status)
-    // }).catch(console.log)
     fetchGreeting()
   }
 
   return (
     <Suspense fallback="loading">
       <div>
-        <h1>
+        <Header>
           {t('title')} {dataFromApi}
-        </h1>
+        </Header>
 
         <Button onClick={handleClick}>{t(`example-of-i18next-usage`)}</Button>
       </div>
