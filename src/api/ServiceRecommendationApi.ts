@@ -1,3 +1,5 @@
+import { Skill, Tag } from '../types/Skill';
+
 // It's better to use environment variables for host and port
 const API_HOST_NAME = 'localhost';
 const API_PORT = '8081';
@@ -7,7 +9,7 @@ type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export default class ServiceRecommendationApi {
   private static instance: ServiceRecommendationApi;
 
-  private constructor() { }
+  private constructor() {}
 
   // Singleton pattern
   public static getInstance(): ServiceRecommendationApi {
@@ -17,14 +19,18 @@ export default class ServiceRecommendationApi {
     return ServiceRecommendationApi.instance;
   }
 
-  private async _request(method: RequestMethod, params: string, body?: Object): Promise<Response> {
+  private async _request(
+    method: RequestMethod,
+    params: string,
+    body?: object,
+  ): Promise<Response> {
     const requestInit: RequestInit = {
       method: method,
       // mode: 'no-cors',
       headers: {
-        "Accept": "application/json",
-        'Content-Type': 'application/json'
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     };
 
     if (body) {
@@ -32,7 +38,10 @@ export default class ServiceRecommendationApi {
     }
 
     try {
-      const response = await fetch(`http://${API_HOST_NAME}:${API_PORT}/${params}`, requestInit);
+      const response = await fetch(
+        `http://${API_HOST_NAME}:${API_PORT}/${params}`,
+        requestInit,
+      );
       console.log('response', response);
 
       if (!response.ok) {
@@ -40,9 +49,38 @@ export default class ServiceRecommendationApi {
       }
       return response;
     } catch (error) {
-      console.error("Fetch error: ", error);
+      console.error('Fetch error: ', error);
       throw error;
     }
+  }
+
+  public getAllSkills(): Promise<Response> {
+    return this._request('GET', 'skills');
+  }
+
+  // Get skill by ID
+  public getSkillById(id: number): Promise<Response> {
+    return this._request('GET', `skills/${id}`);
+  }
+
+  // Get skills by tags
+  public getSkillsByTags(tags: Tag[]): Promise<Response> {
+    return this._request('POST', 'skills/tag', tags);
+  }
+
+  // Add a new skill
+  public addSkill(skill: Skill): Promise<Response> {
+    return this._request('POST', 'skills', skill);
+  }
+
+  // Update an existing skill
+  public updateSkill(skill: Skill): Promise<Response> {
+    return this._request('PUT', 'skills', skill);
+  }
+
+  // Delete skill by ID
+  public deleteSkillById(id: number): Promise<Response> {
+    return this._request('DELETE', `skills/${id}`);
   }
 
   // Example method
@@ -51,7 +89,7 @@ export default class ServiceRecommendationApi {
   }
 
   public getSwagger(): Promise<Response> {
-    return this._request('GET', 'swagger-ui.html')
+    return this._request('GET', 'swagger-ui.html');
   }
 }
 
