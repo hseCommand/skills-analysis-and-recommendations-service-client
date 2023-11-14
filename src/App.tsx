@@ -32,7 +32,9 @@ export default function App() {
   return (
     <Suspense fallback="loading">
       <div>
-        <h1>React {dataFromApi}</h1>
+        <h1>
+          {t('title')} {dataFromApi}
+        </h1>
 
         <Button onClick={handleClick}>{t(`example-of-i18next-usage`)}</Button>
       </div>
