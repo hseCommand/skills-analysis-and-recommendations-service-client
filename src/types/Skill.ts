@@ -4,25 +4,24 @@ export type Skill = {
   unitType: UnitType
   tags: Tag[]
   skillData: SkillData
-};
-
+}
 
 enum SkillType {
-  EMPLOYEE = "EMPLOYEE",
-  TEAM = "TEAM"
+  EMPLOYEE = 'EMPLOYEE',
+  TEAM = 'TEAM',
 }
 
 enum UnitType {
-  UNIT = "UNIT",
-  UNIT_TYPE = "UNIT_TYPE"
+  UNIT = 'UNIT',
+  UNIT_TYPE = 'UNIT_TYPE',
 }
 
 export type Tag = {
   id: number
-  tag: String
-};
+  tag: string
+}
 
 export type SkillData = {
   id: number
   skillGrades: any
-};
+}

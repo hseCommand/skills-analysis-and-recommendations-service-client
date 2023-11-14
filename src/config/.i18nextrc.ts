@@ -1,10 +1,10 @@
 let debug = false
 switch (process.env.NODE_ENV) {
-  case "production":
-    break;
-  case "development":
-    debug = true;
-    break;
+  case 'production':
+    break
+  case 'development':
+    debug = true
+    break
 }
 
 export default {
@@ -19,12 +19,12 @@ export default {
   },
   load: 'languageOnly',
   lngs: ['ru', 'en'],
-  fallbackLng: "ru",
+  fallbackLng: 'ru',
 
-  ns: ["common"],
-  defaultNS: "common",
+  ns: ['common'],
+  defaultNS: 'common',
 
   interpolation: {
-    escapeValue: false
-  }
+    escapeValue: false,
+  },
 }

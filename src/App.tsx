@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import ServiceRecommendationApi from './api/ServiceRecommendationApi';
-import { Button } from './components/Button/Button';
+import ServiceRecommendationApi from './api/ServiceRecommendationApi'
+import { Button } from './components/Button/Button'
 
-import './app.less';
+import './app.less'
 
 export default function App() {
-  const [dataFromApi, setDataFromApi] = useState<any>();
-  const apiService = ServiceRecommendationApi.getInstance();
+  const [dataFromApi, setDataFromApi] = useState<any>()
+  const apiService = ServiceRecommendationApi.getInstance()
 
   const fetchGreeting = async () => {
     try {
-      const response = await apiService.getSwagger();
+      const response = await apiService.getSwagger()
 
-      const data = await response.json();
-      setDataFromApi(data.message); // Assuming the response has a message property
+      const data = await response.json()
+      setDataFromApi(data.message) // Assuming the response has a message property
     } catch (error) {
-      console.error('There was an error fetching the greeting', error);
+      console.error('There was an error fetching the greeting', error)
     }
-  };
+  }
   const handleClick = () => {
     // api.hello().then((d: Response) => {
     //   setDataFromApi(d.status)
     // }).catch(console.log)
-    fetchGreeting();
-  };
+    fetchGreeting()
+  }
 
   return (
     <div>
@@ -32,5 +32,5 @@ export default function App() {
 
       <Button onClick={handleClick}>{'get hello world from API'}</Button>
     </div>
-  );
+  )
 }
