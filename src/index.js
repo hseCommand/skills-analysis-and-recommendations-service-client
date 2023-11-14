@@ -1,17 +1,17 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
 import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
+import { default as Backend } from 'i18next-http-backend'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import { initReactI18next } from 'react-i18next'
-import XHR from 'i18next-xhr-backend'
-import i18nextrc from './config/.i18nextrc'
-import I18NextHttpBackend from 'i18next-http-backend'
+import { Provider } from 'react-redux'
 
 import App from './App'
+import i18nextrc from './config/.i18nextrc'
 import { store } from './store/store'
 
 async function initI18next() {
+  console.log('i18next init')
   i18n.on('languageChanged', (lng) => {
     if (lng.length > 2) {
       i18n.changeLanguage(lng.substring(0, 2))
@@ -25,8 +25,7 @@ async function initI18next() {
   })
 
   await i18n
-    .use(I18NextHttpBackend)
-    .use(XHR)
+    .use(Backend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init(i18nextrc) // temporary solution, need to remove any in future

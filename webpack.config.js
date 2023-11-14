@@ -1,7 +1,10 @@
 /* eslint-disable */
 
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin')
+
+const langs = ['ru']
 
 module.exports = {
   entry: './src/index.js',
@@ -64,5 +67,17 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'index.html'),
     }),
+    new MergeJsonWebpackPlugin({
+      encoding: 'utf8',
+      debug: true,
+      output: {
+        groupBy: [
+          {
+            pattern: './src/locales/ru/translation.json',
+            fileName: 'locales/ru.json',
+          },
+        ],
+      },
+    }),
   ],
-};
+}

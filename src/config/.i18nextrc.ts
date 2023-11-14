@@ -9,22 +9,20 @@ switch (process.env.NODE_ENV) {
 
 export default {
   debug,
-
-  // backend: {
-  //   loadPath: "./locales/{{lng}}.json"
-  // },
-
   react: {
     useSuspense: false,
   },
   load: 'languageOnly',
-  lngs: ['ru', 'en'],
-  fallbackLng: 'ru',
+  lngs: ['ru'],
 
-  ns: ['common'],
-  defaultNS: 'common',
+  fallbackLng: 'ru',
 
   interpolation: {
     escapeValue: false,
+  },
+  resources: {
+    ru: {
+      translation: require('../locales/ru/translation.json'),
+    },
   },
 }

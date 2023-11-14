@@ -1,7 +1,6 @@
 import React from 'react'
 
 import './button.less'
-import { useTranslation } from 'react-i18next'
 
 type IButtonProps = {
   disabled?: boolean
@@ -11,13 +10,12 @@ type IButtonProps = {
 
 export const Button: React.FC<IButtonProps> = ({
   onClick,
-  // children,
+  children,
   disabled = false,
 }): React.ReactElement => {
-  const { t } = useTranslation()
   return (
     <button className="button" onClick={onClick} disabled={disabled}>
-      {t(`example-of-i18next-usage`)}
+      {children}
     </button>
   )
 }
