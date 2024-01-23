@@ -7,8 +7,9 @@ import { initReactI18next } from 'react-i18next'
 import { Provider } from 'react-redux'
 
 import App from './App'
+
 import i18nextrc from './config/.i18nextrc'
-import { store } from './store/store'
+import { setupStore } from './store/store'
 
 async function initI18next() {
   console.log('i18next init')
@@ -32,6 +33,7 @@ async function initI18next() {
 }
 
 initI18next()
+const store = setupStore()
 
 ReactDOM.createRoot(document.querySelector('#root')).render(
   <Provider store={store}>

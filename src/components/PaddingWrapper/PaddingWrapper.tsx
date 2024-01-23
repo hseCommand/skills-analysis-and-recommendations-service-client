@@ -9,8 +9,9 @@ interface IPaddingWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
 export const PaddingWrapper = forwardRef<HTMLDivElement, IPaddingWrapperProps>(
   (props, ref) => {
     const { children, ...rest } = props
+
     return (
-      <div ref={ref} className="paddingWrapper" {...rest}>
+      <div {...rest} ref={ref} className={'paddingWrapper  ' + props.className}>
         {children}
       </div>
     )

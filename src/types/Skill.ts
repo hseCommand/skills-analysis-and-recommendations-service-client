@@ -7,13 +7,13 @@ export type Skill = {
 }
 
 enum SkillType {
-  EMPLOYEE = 'EMPLOYEE',
-  TEAM = 'TEAM',
+  EMPLOYEE,
+  TEAM,
 }
 
 enum UnitType {
-  UNIT = 'UNIT',
-  UNIT_TYPE = 'UNIT_TYPE',
+  UNIT,
+  UNIT_TYPE,
 }
 
 export type Tag = {
@@ -23,5 +23,28 @@ export type Tag = {
 
 export type SkillData = {
   id: number
-  skillGrades: any
+  skillGrades: SkillGrade[]
+}
+
+type SkillGrade = {
+  id: number
+  gradeNumber: number
+  requirements: Requirement[]
+  artifact: Artifact
+  recommendation: Recommendation
+}
+
+interface Artifact {
+  id: number
+  artifact: string
+}
+
+interface Recommendation {
+  id: number
+  message: string
+}
+
+interface Requirement {
+  id: number
+  requirement: string
 }
