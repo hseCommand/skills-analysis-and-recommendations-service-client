@@ -7,6 +7,7 @@ import SignUp from './SignUp'
 import SignIn from './SignIn'
 import Skills from './Skills'
 import Profiles from './Profiles'
+import AddSkill from './AddSkill'
 
 const App = () => {
   return(
@@ -15,7 +16,7 @@ const App = () => {
         <Route path='/signin' element={<SignIn/>}/>
         <Route path='/skills' element={<Skills/>}/>
         <Route path='/profiles' element={<Profiles/>}/>
-        {/* <Route path='/elogin' element={<EmployeeLogin/>}/> */}
+        <Route path='/addskill' element={<AddSkill/>}/>
         {/* <Route path='/:restaurantId' element={<Restaurant/>}/> */}
         {/* <Route path='/order' element={<TakeOrder/>}/> */}
     </Routes>

@@ -2,30 +2,40 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Col, Button, Row, Container, Card, Form } from 'react-bootstrap';
+import { jwtDecode } from "jwt-decode";
 
+interface JwtPayload {
+    id: string,
+    name: string,
+    // roles: []
+}
 
 function SignIn() {
-    const [username, usernameSet] = useState("")
+    const [name, nameSet] = useState("")
     const [password, passwordSet] = useState("")
     const [error, errorSet] = useState("")
 
     const navigate = useNavigate()
 
     let login = () => {
-        fetch("http://localhost:8081/auth/token", {
-              method: "POST",
-              body: JSON.stringify({
-                    email: username,
-                    password: password
-                }),
-              headers: {
-                'Accept': '*/*',
-                'Content-Type': 'application/json'
-              }
-          }
-          ).then(res=>res.json())
+        fetch("http://localhost:8080/auth/token", {
+            method: "POST",
+            headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                name: name,
+                password: password
+            })
+        }).then(res=>res.text())
           .then(response=>{
             localStorage.setItem('token', response)
+            const decoded = jwtDecode<JwtPayload>(response);
+            localStorage.setItem('id', decoded.id)
+            localStorage.setItem('name', decoded.name)
+            // localStorage.setItem('roles', decoded.roles)
+
+            navigate("/profiles")
           })
           .catch(er=>{
             console.log(er.message)
@@ -53,7 +63,9 @@ function SignIn() {
                                 <Form.Label className="text-center">
                                     Name
                                 </Form.Label>
-                                <Form.Control type="email" placeholder="Enter name" />
+                                <Form.Control type="email" placeholder="Enter name"
+                                    onChange={a => nameSet(a.target.value)}
+                                />
                             </Form.Group>
 
                             <Form.Group
@@ -61,7 +73,9 @@ function SignIn() {
                                 controlId="formBasicPassword"
                             >
                                 <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password" />
+                                <Form.Control type="password" placeholder="Password"
+                                    onChange={a => passwordSet(a.target.value)}
+                                />
                             </Form.Group>
                             <Form.Group
                                 className="mb-3"

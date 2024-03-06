@@ -2,7 +2,13 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Col, Button, Row, Container, Card, Form } from 'react-bootstrap';
+import { jwtDecode } from "jwt-decode";
 
+interface JwtPayload {
+    id: string,
+    name: string,
+    // roles: []
+}
 
 function SignUp() {
     const [name, nameSet] = useState("")
@@ -12,8 +18,25 @@ function SignUp() {
 
     const navigate = useNavigate()
 
+    let validate = () => {
+        fetch(`http://localhost:8080/auth/validate?token=${localStorage.getItem('token')}`, {
+            method: "GET",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+        }).then(res=>res.json())
+        .then(response=>{
+            if(response) {
+                navigate('/profiles')
+            }
+        })
+    }
+
+    useEffect(validate)
+
     let register = () => {
-        fetch("http://localhost:8081/auth/register", {
+        fetch("http://localhost:8080/auth/register", {
               method: "POST",
               body: JSON.stringify({
                     name: name,
@@ -21,13 +44,39 @@ function SignUp() {
                     password: password
                 }),
               headers: {
-                'Accept': 'application/json',
+                'Accept': '*/*',
                 'Content-Type': 'application/json',
               },
           }
-          ).then(res=>res.json())
+          ).then(response=>{
+            if(response) {
+                login()
+            }
+          })
+          .catch(er=>{
+            console.log(er.message)
+        })
+    }
+
+    let login = () => {
+        fetch("http://localhost:8080/auth/token", {
+            method: "POST",
+            headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                name: name,
+                password: password
+            })
+        }).then(res=>res.text())
           .then(response=>{
-            console.log(response)
+            localStorage.setItem('token', response)
+            const decoded = jwtDecode<JwtPayload>(response);
+            localStorage.setItem('id', decoded.id)
+            localStorage.setItem('name', decoded.name)
+            // localStorage.setItem('roles', decoded.roles)
+
+            navigate("/profiles")
           })
           .catch(er=>{
             console.log(er.message)
