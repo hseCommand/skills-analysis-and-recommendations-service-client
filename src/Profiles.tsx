@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Col, Modal, Button, Form, Container } from 'react-bootstrap';
 import Multiselect from 'multiselect-react-dropdown';
+import GeneralProfileCreationComponent from './profile/GeneralProfileCreationComponent';
 
 import './style/App.css'
 
@@ -23,6 +24,8 @@ function Profiles() {
     const [tags, tagsSet] = useState<any[]>([{name: "tag 1", id: 1}, {name: "tag 2", id: 2}])
     const [tagsSelected, tagsSelectedSet] = useState<any[]>([])
 
+    // TODO: Consider looking at Context way of changing state in a parent-child components.
+    const [profileCreationActive, setProfileCreationActive] = useState<boolean>(false)
 
     const navigate = useNavigate()
 
@@ -197,8 +200,12 @@ function Profiles() {
                     )})}
             </select>
                 <Container>
-
+                    <Button onClick={() => { setProfileCreationActive(true); }}>Создать селф-ревью</Button>
                 </Container>
+                {profileCreationActive ? 
+                    <GeneralProfileCreationComponent cancelFunc={ () => { setProfileCreationActive(false); } } />
+                    : ""
+                }
             </div>
             }
             {/* <Modal.Dialog>
