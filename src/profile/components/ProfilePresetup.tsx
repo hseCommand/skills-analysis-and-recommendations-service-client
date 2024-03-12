@@ -11,37 +11,36 @@ import {
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import './popup.css'
-
-const unitTypesSelectLabels = [
-  { label: "Unit", value: "UNIT" },
-  { label: "Developer", value: "DEVELOPER" },
-  { label: "Tester", value: "TESTER" },
-  { label: "Analyst", value: "ANALYST" },
-]
-
-const tagsSelectLabels = [
-  "Java",
-  "Программирование",
-  "Базы данных",
-  "Управление проектами",
-]
+import { getAllSkillTypes, getAllUnitTypes, getAllTags } from '../api/skills'
 
 const levelsSelectLabels: string[] = Array.from(Array(8).keys()).map((_, i) => (1 + i).toString())
 
-// TODO: Add tags handling.
 // TODO: Add error handling (specifically - empty fields).
 const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
+  const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
+  const [unitTypesSelectLabels, setUnitTypesSelectLabels] = useState<string[]>([])
+  const [tagsSelectLabels, setTagsSelectLabels] = useState<string[]>([])
+
   const [skillType, setSkillType] = useState<string>()
-  const [unitType, setUnitType] = useState<{ label: string, value: string }>()
+  const [unitType, setUnitType] = useState<string>()
   const [tags, setTags] = useState<string[]>()
   const [level, setLevel] = useState<string>()
+
+  useEffect(() => {
+    Promise.all([getAllSkillTypes(), getAllUnitTypes(), getAllTags()])
+      .then(([skillTypes, unitTypes, tags]) => {
+        setSkillTypesSelectLabels(skillTypes)
+        setUnitTypesSelectLabels(unitTypes)
+        setTagsSelectLabels(tags)
+      })
+  }, [])
 
   const aggregatePresetupData = () => {
     let data: ProfilePresetupReturn = {
       skillType: skillType,
-      unitType: unitType.value,
+      unitType: unitType,
       tags: tags,
-      level: +level,
+      targetGradeByDefault: +level,
     }
     return data
   }
@@ -58,8 +57,9 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
               value={skillType}
               onChange={(e) => { setSkillType(e.target.value) }}
             >
-              <MenuItem value="EMPLOYEE">Сотрудник</MenuItem>
-              <MenuItem value="TEAM">Команда</MenuItem>
+              {skillTypesSelectLabels.map((skillType) =>
+                <MenuItem key={skillType} value={skillType}>{skillType}</MenuItem>
+              )}
             </Select>
           </FormControl>
           <Autocomplete
@@ -67,16 +67,16 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
             options={unitTypesSelectLabels}
             renderInput={(params) => <TextField {...params} label="Тип Юнита*" />}
             value={unitType}
-            autoSelect
             autoHighlight
             autoComplete
             onChange={(e, newValue) => { setUnitType(newValue) }}
-            getOptionLabel={option => option.label}
+          // getOptionLabel={option => option.label}
           />
           <Autocomplete
             disablePortal
             options={tagsSelectLabels}
             renderInput={(params) => <TextField {...params} label="Выбрать теги" />}
+            autoHighlight
             multiple
             value={tags}
             onChange={(e, newValue) => { setTags(newValue) }}
@@ -86,7 +86,6 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
             options={levelsSelectLabels}
             renderInput={(params) => <TextField {...params} label="Уровень/грейд" />}
             value={level}
-            autoSelect
             autoHighlight
             onChange={(e, newValue) => { setLevel(newValue) }}
           />

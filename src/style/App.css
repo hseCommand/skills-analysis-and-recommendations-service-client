@@ -1,11 +1,15 @@
-#root{
+#root {
     width: 100%;
-  }
-  
-  *{
+}
+
+* {
     padding: 0;
     margin: 0;
-  }
+}
+
+p {
+    margin-bottom: 0;
+}
 
 .profileHeader {
     width: 100vw;
@@ -137,4 +141,8 @@ input {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+td {
+    padding: 0 !important
 }

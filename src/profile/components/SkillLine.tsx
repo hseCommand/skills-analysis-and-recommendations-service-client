@@ -15,8 +15,6 @@ const SkillLine = ({ name, onClick, targetLevel, level }: SkillProps) => {
     color = '#f59287'
   }
 
-  console.log('SkillLine level: ' + level)
-
   return (
     <Box onClick={onClick} sx={{
       display: "flex",

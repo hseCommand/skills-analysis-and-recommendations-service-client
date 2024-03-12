@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 
 // TODO: Нужно ли переключение между навыками, не выключая предыдущего навыка (интуитивно понятно)?
 // Или сделать жесткое выполнение: не нажал cancel, save или next - не вышел (затемняя остальную область, чтобы не работала).
-const SkillReviewWindow = ({ initialData, saveDataFunc, cancelFunc }: SkillReviewWindowProps) => {
+const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, readOnly }: SkillReviewWindowProps) => {
   let currentData = initialData;
   const [skillInfo, setSkillInfo] = useState<any>()
   let getSkillInfo = () => {
@@ -80,8 +80,8 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, cancelFunc }: SkillRevie
               currentData.level = +newValue;
               saveDataFunc(currentData);
             }}
-            autoSelect
             autoHighlight
+            readOnly={readOnly}
           />
           <TextField
             multiline
@@ -101,6 +101,9 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, cancelFunc }: SkillRevie
         placeholder='Артефакты'
         multiline
         rows={4}
+        InputProps={{
+          readOnly: readOnly,
+        }}
       />
       <TextField
         value={commentary}
@@ -111,12 +114,17 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, cancelFunc }: SkillRevie
         placeholder='Комментарий'
         multiline
         rows={4}
+        InputProps={{
+          readOnly: readOnly,
+        }}
       />
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
-        <Button sx={{ mr: "auto" }} onClick={cancelFunc}>Назад</Button>
+        <Button sx={{ mr: "auto" }} onClick={prevFunc}>Назад</Button>
         {/* TODO: Fix saveDataFunc - retrieve data from input fields. */}
-        <Button onClick={() => { saveDataFunc(currentData); }}>Сохранить</Button>
-        <Button>Далее</Button>
+        {!readOnly &&
+          <Button onClick={() => { saveDataFunc(currentData); }}>Сохранить</Button>
+        }
+        <Button onClick={nextFunc}>Далее</Button>
       </Box>
     </Stack>
   )

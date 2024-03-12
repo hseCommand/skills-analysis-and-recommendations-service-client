@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ProfilePrestup from './components/ProfilePresetup'
-import ProfileView from './components/ProfileView'
+import ProfileView, { ProfileViewInputValues, ProfileViewScenario } from './components/ProfileView'
 import ProfileCreationSuccess from './components/ProfileCreationSuccess'
 
 enum Stage {
@@ -11,23 +11,26 @@ enum Stage {
 
 const GeneralProfileCreationComponent = ({ cancelFunc }: PopupProps) => {
   const [stage, setStage] = useState<Stage>(Stage.Presetup)
-  const [passingValue, setPassingValue] = useState<any>()
+  const [passingValue, setPassingValue] = useState<ProfilePresetupReturn>()
   const cancelAllFunc = () => {
     cancelFunc()
     setStage(Stage.Presetup)
   }
 
   if (stage == Stage.Presetup) {
-    return <ProfilePrestup cancelFunc={cancelAllFunc} nextFunc={(outputValues: any) => {
+    return <ProfilePrestup cancelFunc={cancelAllFunc} nextFunc={(outputValues: ProfilePresetupReturn) => {
       setStage(Stage.ProfileView)
       setPassingValue(outputValues)
     }} />
   } else if (stage == Stage.ProfileView) {
-    return <ProfileView cancelFunc={cancelAllFunc} inputValues={passingValue} 
-    nextFunc={(outputValues: any) => {
-      setStage(Stage.Success)
-      setPassingValue(outputValues)
-    }} />
+    let inputValues: ProfileViewInputValues = {
+      scenario: ProfileViewScenario.Create,
+      payload: passingValue
+    }
+    return <ProfileView cancelFunc={cancelAllFunc} inputValues={inputValues}
+      nextFunc={(outputValues: any) => {
+        setStage(Stage.Success)
+      }} />
   } else if (stage == Stage.Success) {
     return <ProfileCreationSuccess cancelFunc={cancelAllFunc} />
   }
