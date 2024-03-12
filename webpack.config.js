@@ -7,6 +7,7 @@ module.exports = {
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "build"),
+    publicPath: '/'
   },
 
   mode: 'development',
@@ -25,7 +26,8 @@ module.exports = {
     compress: false,
     port: 3000,
     open: true,
-    hot: true
+    hot: true,
+    historyApiFallback: true
   },
   
   module: {
@@ -51,7 +53,6 @@ module.exports = {
           // compiles Less to CSS
           "style-loader",
           "css-loader",
-          "less-loader",
         ],
       }
     ],

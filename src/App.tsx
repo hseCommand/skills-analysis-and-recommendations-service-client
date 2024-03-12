@@ -1,43 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import {Routes, Route} from 'react-router-dom'
 
-import ServiceRecommendationApi from './api/ServiceRecommendationApi';
-import { Button } from './components/Button/Button';
+import './style/App.css'
 
-import './app.less'
+import SignUp from './SignUp'
+import SignIn from './SignIn'
+import Skills from './Skills'
+import Profiles from './Profiles'
+import AddSkill from './AddSkill'
+import SkillView from './SkillView'
 
-export default function App() {
-  const [dataFromApi, setDataFromApi] = useState<any>()
-  const apiService = ServiceRecommendationApi.getInstance()
-
-  useEffect(() => {
-
-
-  }, []);
-  const fetchGreeting = async () => {
-    try {
-      const response = await apiService.getSwagger()
-
-      const data = await response.json();
-      setDataFromApi(data.message); // Assuming the response has a message property
-    } catch (error) {
-      console.error("There was an error fetching the greeting", error);
-    }
-  };
-  const handleClick = () => {
-    // api.hello().then((d: Response) => {
-    //   setDataFromApi(d.status)
-    // }).catch(console.log)
-    fetchGreeting();
-
-  }
-
-  return (
-    <div>
-      <h1>React {dataFromApi}</h1>
-
-      <Button onClick={handleClick}>
-        {'get hello world from API'}
-      </Button>
-    </div>
-  );
+const App = () => {
+  return(
+    <Routes>
+        <Route path='/' element={<SignUp/>}/>
+        <Route path='/signin' element={<SignIn/>}/>
+        <Route path='/skills' element={<Skills/>}/>
+        <Route path='/profiles' element={<Profiles/>}/>
+        <Route path='/addskill' element={<AddSkill/>}/>
+        <Route path='/skill/:skillId' element={<SkillView/>}/>
+        {/* <Route path='/order' element={<TakeOrder/>}/> */}
+    </Routes>
+  )
 }
+
+export default App;

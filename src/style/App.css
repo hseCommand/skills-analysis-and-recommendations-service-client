@@ -1,0 +1,175 @@
+#root {
+    width: 100%;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+p {
+    margin-bottom: 0;
+}
+
+.profileHeader {
+    width: 100vw;
+    height: 60px;
+}
+
+.username {
+    width: auto;
+    height: 40px;
+    padding-top: 10px;
+    padding-right: 20px;
+    float: right;
+}
+
+.profileBtns {
+    width: 100vw;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    border-bottom: solid 2px black;
+}
+
+.profileBtn {
+    margin-left: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+
+.selected {
+    box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.1);
+}
+
+.skillSearch {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.optionsRow {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    margin-top: 10px;
+}
+
+.searchBtn {
+    margin-top: 20px;
+}
+
+.skillsListHead {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    column-gap: 20px;
+    border-bottom: solid 2px black;
+    width: 100vw;
+    margin-top: 40px;
+}
+
+.slhTitle {
+    padding-left: 15px;
+    width: 300px;
+    font-weight: bold;
+}
+
+.slhTags {
+    padding-right: 15px;
+    width: 550px;
+    font-weight: bold;
+}
+
+.skillInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 20px;
+    border-bottom: solid 1px gray;
+    justify-content: space-between;
+}
+
+.skillTitle {
+    padding-left: 15px;
+    width: 300px;
+}
+
+.skillTags {
+    padding-right: 15px;
+    width: 550px;
+}
+
+.AddSkillWindow {
+    width: 100vw;
+    height: 100vh;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+input {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.selectsBlock {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 10px;
+}
+
+.levelsBlockAdd {
+    width: 100%;
+    margin-top: 40px;
+}
+
+.addSkillBtns {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    border-bottom: solid 2px black;
+}
+
+.addSkillBtn {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+
+.addSkillLevel {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
+    background-color: white;
+    border: none;
+}
+
+.resultBtnsAS {
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+td {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
