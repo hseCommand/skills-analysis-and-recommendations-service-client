@@ -145,17 +145,22 @@ function SkillView() {
         let skillGrades : any = []
         levels.forEach(level => {
             skillGrades.push({
-                gradeNumber: level - 1,
+                gradeNumber: level,
                 requirements: requirements[level - 1],
                 recommendation: recommends[level - 1]
             })
         })
+        let tagsSaved: any[] = []
+        tagsSelect.forEach(tag => {
+            tagsSaved.push(tag.name)
+        })
         fetch("http://localhost:8080/skills", {
-              method: "POST",
+              method: "PUT",
               body: JSON.stringify({
+                "id": skillId,
                 "skillType": currentSkillType,
                 "unitType": currentunitTypes,
-                "tags": tagsSelect,
+                "tags": tagsSaved,
                 "name": name,
                 "skillGrades": skillGrades,
 
@@ -168,31 +173,52 @@ function SkillView() {
           }
           ).then(response=>{
             if(response) {
-
+                console.log(skillGrades);
+                
+                navigate('/profiles')
             }
           })
           .catch(er=>{
             console.log(er.message)
         })
+    }
 
-        navigate('/profiles')
+    let deleteClicked = () => {
+        fetch(`http://localhost:8080/skills/${skillId}`, {
+              method: "DELETE",
+              headers: {
+                'Accept': '*/*',
+                // 'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('token')
+              },
+          })
+          .then(() =>
+                navigate("/profiles")
+            
+          )
+          .catch(er=>{
+            console.log(er.message)
+        })
     }
 
     return(
     <div className="AddSkillWindow">
         <input className='skillnameInput' placeholder='Название навыка'
         value={name} onChange={e => nameSet(e.target.value)} disabled={!roles.includes("ADMIN")}></input>
+        
         <div className="selectsBlock">
-            <select className='selection skilltype' defaultValue={currentSkillType || "Тип навыка"} 
+            <select className='selection skilltype' value={currentSkillType}
                 onChange={e => currentSkillTypeSet(e.target.value)} disabled={!roles.includes("ADMIN")}>
                     {skillTypes.map((option: any, i: number) => {
+                        console.log(currentSkillType);
+                        
                         return(
                         <option key={i} value={option}>
                             {option}
                         </option>
                     )})}
             </select>
-            <select className='selection unittype' defaultValue={currentunitTypes || "Тип юнита"}
+            <select className='selection unittype' value={currentunitTypes}
                 onChange={e => currentUnitTypesSet(e.target.value)} disabled={!roles.includes("ADMIN")}>
                     {unitTypes.map((option: any, i: number) => {
                         return(
@@ -208,7 +234,7 @@ function SkillView() {
                 onSelect={onSelect} // Function will trigger on select event
                 onRemove={onRemove} // Function will trigger on remove event
                 displayValue="name"
-                // disabled={!roles.includes("ADMIN")}
+                disable={!roles.includes("ADMIN")}
             />
         </div>
         <div className="levelsBlockAdd">
@@ -221,19 +247,27 @@ function SkillView() {
                     onClick={e => changeTab(i)}>Уровень {i+1}</div>
                 )
             })}
+            {roles.includes("ADMIN") &&
                 <button className='addSkillLevel'
                 onClick={addLevel}>+</button>
+            }
             </div>
             <input className='reqLevel' placeholder='Требования к уровню' 
-            value={requirements.at(currLevel)} onChange={e => requirementChanged(e.target.value)} />
+            value={requirements.at(currLevel)} onChange={e => requirementChanged(e.target.value)} 
+            disabled={!roles.includes("ADMIN")} />
             <input className='artefactLevel' placeholder='Возможные артефакты' 
-            value={artefacts[currLevel]} onChange={e => artefactChanged(e.target.value)} />
+            value={artefacts[currLevel]} onChange={e => artefactChanged(e.target.value)} 
+            disabled={!roles.includes("ADMIN")} />
             <input className='recomLevel' placeholder='Рекомендации' 
-            value={recommends.at(currLevel)} onChange={e => recommendChanged(e.target.value)} />
+            value={recommends.at(currLevel)} onChange={e => recommendChanged(e.target.value)}
+            disabled={!roles.includes("ADMIN")} />
         </div>
         <div className="resultBtnsAS">
             <button className='resultBtn' onClick={backClicked}>Назад</button>
-            <button className='resultBtn' onClick={saveClicked}>Сохранить</button>
+            {roles.includes("ADMIN") &&
+            <button className='resultBtn deleteBtn' onClick={deleteClicked}>Удалить</button>}
+            {roles.includes("ADMIN") &&
+            <button className='resultBtn' onClick={saveClicked}>Сохранить</button>}
         </div>
     </div>
     )

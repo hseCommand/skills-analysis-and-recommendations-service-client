@@ -109,7 +109,7 @@ function AddSkill() {
         let skillGrades : any = []
         levels.forEach(level => {
             skillGrades.push({
-                gradeNumber: level - 1,
+                gradeNumber: level,
                 requirements: requirements[level - 1],
                 recommendation: recommends[level - 1]
             })
