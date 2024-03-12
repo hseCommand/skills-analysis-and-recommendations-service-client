@@ -158,7 +158,6 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
 
   const saveExistingProfile = () => {
     let curr = presetupData as ExistingProfileData
-    console.log(formatSkillsArray())
 
     let profileData: ProfileEdit = {
       id: curr.id,

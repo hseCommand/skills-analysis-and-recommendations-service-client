@@ -76,13 +76,14 @@ interface ProfileEdit {
 
 interface ProfileMenuListActions {
   deleteAction: () => void,
+  archiveAction: () => void,
 }
 
 // enum ProfileStatus {
-//   New,
-//   InProgress,
-//   Ready,
-//   Archived,
+//   NEW,
+//   DONE,
+//   IN_PROGRESS,
+//   ARCHIVE,
 // }
 
 interface ExistingProfileData {

@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import { IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-export default function ProfileMenuList({ deleteAction }: ProfileMenuListActions) {
+export default function ProfileMenuList({ deleteAction, archiveAction }: ProfileMenuListActions) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
@@ -85,7 +85,10 @@ export default function ProfileMenuList({ deleteAction }: ProfileMenuListActions
                   onKeyDown={handleListKeyDown}
                 >
                   <MenuItem onClick={handleClose}>Поделиться</MenuItem>
-                  <MenuItem onClick={handleClose}>В архив</MenuItem>
+                  <MenuItem onClick={(e) => {
+                    archiveAction()
+                    handleClose(e)
+                  }}>В архив</MenuItem>
                   <MenuItem onClick={(e) => {
                     deleteAction()
                     handleClose(e)
