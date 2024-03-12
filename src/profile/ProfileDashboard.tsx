@@ -70,7 +70,7 @@ const ProfileDashboard = () => {
       })
   }, [forceTableKey])
 
-  const deleteProfile = (id: string) => {
+  async function deleteProfile(id: string): Promise<void> {
     fetch("http://localhost:8080/profiles/" + id, {
       method: "DELETE",
       headers: {
@@ -79,10 +79,33 @@ const ProfileDashboard = () => {
       },
     }
     ).then(res => {
+      console.log('profile successfully deleted')
       console.log(res)
     }).catch(er => {
       console.log(er.message)
     })
+  }
+
+  async function archiveProfile(profile: ProfileEdit): Promise<void> {
+    profile.status = "ARCHIVE"
+    
+    await fetch("http://localhost:8080/profiles", {
+      method: "PUT",
+      body: JSON.stringify(profile),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token'),
+      },
+    }
+    ).then(res => res.json())
+      .then(response => {
+        console.log('existing profile successfully edited')
+        console.log(response)
+      })
+      .catch(er => {
+        console.log(er.message)
+      })
   }
 
   async function getProfileData(id: string): Promise<ProfileGet> {
@@ -161,10 +184,14 @@ const ProfileDashboard = () => {
                           })
                           setProfileViewActive(true)
                         }}>Открыть</MButton>
-                        <ProfileMenuList deleteAction={() => {
-                          deleteProfile(profile.id)
-                          forceTableRefresh()
-                        }} />
+                        <ProfileMenuList
+                          deleteAction={async () => {
+                            deleteProfile(profile.id).then(forceTableRefresh)
+                          }}
+                          archiveAction={async () => {
+                            archiveProfile(profile).then(forceTableRefresh)
+                          }}
+                        />
                       </Box>
                     </TableCell>
                   </TableRow>
