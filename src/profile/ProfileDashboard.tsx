@@ -17,9 +17,12 @@ import {
 import ProfileMenuList from './components/ProfileMenuList';
 import ProfileView, { ProfileViewInputValues, ProfileViewScenario } from './components/ProfileView';
 import { getAllSkillTypes } from './api/skills';
-import ProfilePrestup from './components/ProfilePresetup';
+import ProfilePresetup from './components/ProfilePresetup';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
+  
+  const navigate = useNavigate()
   // TODO: Wouldn't filtering inside table headers be better?
   const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
   const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>()
@@ -42,6 +45,7 @@ const ProfileDashboard = () => {
   }, [])
 
   useEffect(() => {
+    
     fetch("http://localhost:8080/profiles/all", {
       method: "GET",
       headers: {
@@ -49,12 +53,19 @@ const ProfileDashboard = () => {
         'Authorization': localStorage.getItem('token')
       },
     }
-    ).then(res => res.json())
+    ).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Not signed in');
+    })
       .then(response => {
         setProfiles(response)
         console.log(response)
       }).catch(er => {
         console.log(er.message)
+        localStorage.clear()
+        navigate('/')
       })
   }, [forceTableKey])
 
@@ -201,7 +212,7 @@ const ProfileDashboard = () => {
         </Box>
       </MStack>
       {profileCreationActive &&
-        <ProfilePrestup
+        <ProfilePresetup
           cancelFunc={() => {
             setProfileCreationActive(false)
           }}

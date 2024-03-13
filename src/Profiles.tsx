@@ -9,7 +9,9 @@ import ProfileDashboard from './profile/ProfileDashboard';
 
 function Profiles() {
     const [fetched, fetchedSet] = useState(0)
+    const [roles, rolesSet] = useState<any[]>([])
 
+    const [allSkills, allSkillsSet] = useState<any[]>([])
     const [skills, skillsSet] = useState<any[]>([])
     const [email, emailSet] = useState("")
     const [name, nameSet] = useState("")
@@ -28,6 +30,7 @@ function Profiles() {
 
     useEffect(() => {
         if (!fetched) {
+            console.log("FETCH!!!")
             fetch("http://localhost:8080/skills", {
               method: "GET",
               headers: {
@@ -38,13 +41,31 @@ function Profiles() {
           ).then(res=>res.json())
           .then(response=>{
             if(response) {
-                console.log(response)
                 skillsSet(response)
+                allSkillsSet(response)
             }
           })
           .catch(er=>{
             console.log(er.message)
         })
+        fetch("http://localhost:8080/skills/tags/all", {
+              method: "GET",
+              headers: {
+                'Accept': '*/*',
+                'Content-Type': 'application/json',
+              },
+          }).then(res=>res.json())
+          .then(response=>{
+            if(response) {
+                let data: any[] = []
+                response.map((e: any, i: number) => {data.push({name: e, id: i})})
+                tagsSet(data)
+            }
+          })
+          .catch(er=>{
+            console.log(er.message)
+        })
+        rolesSet(JSON.parse(localStorage.getItem("roles")))
         fetchedSet(1)
         }
         emailSet(localStorage.getItem("email") || "")
@@ -98,7 +119,44 @@ function Profiles() {
         tagsSelectedSet(selectedList)
     }
 
-    let searchBtnClicked = () => {}
+    let openBtnClicked = (id: any) => {
+        navigate("/skill/"+id)
+    }
+
+    let searchBtnClicked = (skillname: any, type: any, unit: any, tags: any[]) => {
+        let searchTags: any[] = []
+        tagsSelected.forEach(t => searchTags.push(t.name))
+        let skillsFound: any[] = []
+        fetch("http://localhost:8080/skills/filter", {
+            method: "POST",
+            body: JSON.stringify({
+                "skillTypes": [type],
+                "unitTypes": [unit],
+                "tags": searchTags
+
+            }),
+            headers: {
+              'Accept': '*/*',
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('token')
+            },
+        }).then(res=>res.json())
+        .then(response=>{
+            console.log(response)
+          if(response) {
+              skillsFound = response
+              console.log(skillsFound);
+              skillsSet(skillsFound)
+
+          }
+        })
+        .catch(er=>{
+          console.log(er.message)
+      })
+    //   let newskillsFound = skillsFound.filter(skill => skill.name.includes(skillname))
+    //   console.log("found",newskillsFound);
+      
+    }
 
     return (
         <>
@@ -128,7 +186,8 @@ function Profiles() {
             {choosen == "skills" &&
             <div className="skillsProfile">
                 <div className="skillSearch">
-                    <input className='skillnameSearch'></input>
+                    <input className='skillnameSearch' placeholder='Поиск по названию навыка'
+                    value={nameSkill} onChange={e => nameSkillSet(e.target.value)}></input>
                     <div className="optionsRow">
                         <select className='selection skilltype' defaultValue="" 
                             onChange={e => currentSkillTypeSet(e.target.value)}>
@@ -157,30 +216,40 @@ function Profiles() {
                             displayValue="name"
                         />
                     </div>
-                    <button className='searchBtn' onClick={searchBtnClicked}>Найти</button>
+                    <button className='searchBtn' 
+                    onClick={e => searchBtnClicked(nameSkill, currentSkillType, currentUnitType, tagsSelected)}>
+                        Найти</button>
                 </div>
                 <div className="skillsList">
                     <div className="skillsListHead">
                         <div className="slhTitle">Название навыка</div>
                         <div className="slhTags">Теги</div>
+                        <div></div>
                     </div>
                     {skills.map((skill: any, i: number) => {
-                        // let tagsStr = skill.tags.at(0).tag
-                        // if (skill.tags.length >= 2) {
-                        //     tagsStr += ", " + skill.tags.at(1).tag
-                        // }
-                        // if (skill.tags.length > 2) {
-                        //     tagsStr += " + " + (skill.tags.length - 2)
-                        // }
+                        let tagsStr = ""
+                        if (skill.tags.length > 0) {
+                        tagsStr = skill.tags.at(0)
+                        if (skill.tags.length >= 2) {
+                            tagsStr += ", " + skill.tags.at(1)
+                        }
+                        if (skill.tags.length > 2) {
+                            tagsStr += " + " + (skill.tags.length - 2)
+                        }
+                        }
                         return(
                             <div className="skillInfo" key={i}>
                                 <div className="skillTitle">{skill.name}</div>
-                                {/* <div className="skillTags">{tagsStr}</div> */}
-                                <button className='openSkill'>открыть</button>
+                                <div className="skillTags">{tagsStr}</div>
+                                <button className='openSkill' onClick={e => openBtnClicked(skill.id)}>открыть</button>
                             </div>
                         )
                     })}
                 </div>
+                {roles.includes("ADMIN") &&
+                <button onClick={() => {
+                navigate("/addskill")
+                }}>добавить навык</button>}
             </div>
             }
 

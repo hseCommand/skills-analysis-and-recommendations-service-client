@@ -45,12 +45,32 @@ p {
     box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.1);
 }
 
+.skillSearch {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.optionsRow {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    margin-top: 10px;
+}
+
+.searchBtn {
+    margin-top: 20px;
+}
+
 .skillsListHead {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     column-gap: 20px;
     border-bottom: solid 2px black;
     width: 100vw;
+    margin-top: 40px;
 }
 
 .slhTitle {
@@ -70,6 +90,12 @@ p {
     display: flex;
     flex-direction: row;
     column-gap: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 20px;
+    border-bottom: solid 1px gray;
+    justify-content: space-between;
 }
 
 .skillTitle {

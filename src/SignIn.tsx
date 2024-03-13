@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 interface JwtPayload {
     id: string,
     name: string,
-    // roles: []
+    roles: []
 }
 
 function SignIn() {
@@ -33,7 +33,7 @@ function SignIn() {
             const decoded = jwtDecode<JwtPayload>(response);
             localStorage.setItem('id', decoded.id)
             localStorage.setItem('name', decoded.name)
-            // localStorage.setItem('roles', decoded.roles)
+            localStorage.setItem('roles', JSON.stringify(decoded.roles))
 
             navigate("/profiles")
           })

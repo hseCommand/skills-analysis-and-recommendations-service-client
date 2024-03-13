@@ -8,6 +8,7 @@ import SignIn from './SignIn'
 import Skills from './Skills'
 import Profiles from './Profiles'
 import AddSkill from './AddSkill'
+import SkillView from './SkillView'
 
 const App = () => {
   return(
@@ -17,7 +18,7 @@ const App = () => {
         <Route path='/skills' element={<Skills/>}/>
         <Route path='/profiles' element={<Profiles/>}/>
         <Route path='/addskill' element={<AddSkill/>}/>
-        {/* <Route path='/:restaurantId' element={<Restaurant/>}/> */}
+        <Route path='/skill/:skillId' element={<SkillView/>}/>
         {/* <Route path='/order' element={<TakeOrder/>}/> */}
     </Routes>
   )

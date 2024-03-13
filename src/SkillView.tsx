@@ -1,17 +1,18 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Col, Modal, Button, Form, Container } from 'react-bootstrap';
 import Multiselect from 'multiselect-react-dropdown';
 
-
-
-function AddSkill() {
+function SkillView() {
 
     const navigate = useNavigate()
+    let { skillId } = useParams();
 
     const [name, nameSet] = useState("")
     const [fetched, fetchedSet] = useState(0)
+    const [roles, rolesSet] = useState<any[]>([])
+
 
     const [skillTypes, skillTypesSet] = useState<any[]>(["EMPLOYEE", "TEAM"])
     const [currentSkillType, currentSkillTypeSet] = useState("")
@@ -28,7 +29,7 @@ function AddSkill() {
 
     useEffect(() => {
         if (!fetched) {
-        fetch("http://localhost:8080/skills/tags/all", {
+            fetch("http://localhost:8080/skills/tags/all", {
               method: "GET",
               headers: {
                 'Accept': '*/*',
@@ -48,9 +49,44 @@ function AddSkill() {
           .catch(er=>{
             console.log(er.message)
         })
+        fetch(`http://localhost:8080/skills/${skillId}`, {
+              method: "GET",
+              headers: {
+                'Accept': '*/*',
+                'Content-Type': 'application/json',
+              },
+          }).then(res=>res.json())
+          .then(response=>{
+            if(response) {
+                let tagsGet: any[] = []
+                response.tags.map((tag: any, i: number) => {
+                    tagsGet.push({name: tag, id: i})
+                })
+                let levelsGet: any[] = []
+                let reqGet: any[] = []
+                let recGet: any[] = []
+                response.skillGrades.map((grade: any, i: number) => {
+                    levelsGet.push(grade.gradeNumber)
+                    reqGet.push(grade.requirements)
+                    recGet.push(grade.recommendation)
+                })
+                console.log(response);
+                nameSet(response.name)
+                currentSkillTypeSet(response.skillType)
+                currentUnitTypesSet(response.unitType)
+                tagsSelectSet(tagsGet)
+                levelsSet(levelsGet)
+                requirementsSet(reqGet)
+                recommendsSet(recGet)
+            }
+          })
+          .catch(er=>{
+            console.log(er.message)
+        })
+        rolesSet(JSON.parse(localStorage.getItem("roles")))
         fetchedSet(1)
-        }
-    })
+    }
+})
 
     let onSelect = (selectedList: any, selectedItem: any) => {
         tagsSelectSet(selectedList)
@@ -119,8 +155,9 @@ function AddSkill() {
             tagsSaved.push(tag.name)
         })
         fetch("http://localhost:8080/skills", {
-              method: "POST",
+              method: "PUT",
               body: JSON.stringify({
+                "id": skillId,
                 "skillType": currentSkillType,
                 "unitType": currentunitTypes,
                 "tags": tagsSaved,
@@ -135,32 +172,54 @@ function AddSkill() {
               },
           }
           ).then(response=>{
-            navigate('/profiles')
+            if(response) {
+                console.log(skillGrades);
+                
+                navigate('/profiles')
+            }
           })
           .catch(er=>{
             console.log(er.message)
         })
+    }
 
+    let deleteClicked = () => {
+        fetch(`http://localhost:8080/skills/${skillId}`, {
+              method: "DELETE",
+              headers: {
+                'Accept': '*/*',
+                // 'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('token')
+              },
+          })
+          .then(() =>
+                navigate("/profiles")
+            
+          )
+          .catch(er=>{
+            console.log(er.message)
+        })
     }
 
     return(
     <div className="AddSkillWindow">
         <input className='skillnameInput' placeholder='Название навыка'
-        value={name} onChange={e => nameSet(e.target.value)}></input>
+        value={name} onChange={e => nameSet(e.target.value)} disabled={!roles.includes("ADMIN")}></input>
+        
         <div className="selectsBlock">
-            <select className='selection skilltype' defaultValue="" 
-                onChange={e => currentSkillTypeSet(e.target.value)}>
-                    <option hidden value="">Тип навыка</option>
+            <select className='selection skilltype' value={currentSkillType}
+                onChange={e => currentSkillTypeSet(e.target.value)} disabled={!roles.includes("ADMIN")}>
                     {skillTypes.map((option: any, i: number) => {
+                        console.log(currentSkillType);
+                        
                         return(
                         <option key={i} value={option}>
                             {option}
                         </option>
                     )})}
             </select>
-            <select className='selection unittype' defaultValue="" 
-                onChange={e => currentUnitTypesSet(e.target.value)}>
-                    <option hidden value="">Тип юнита</option>
+            <select className='selection unittype' value={currentunitTypes}
+                onChange={e => currentUnitTypesSet(e.target.value)} disabled={!roles.includes("ADMIN")}>
                     {unitTypes.map((option: any, i: number) => {
                         return(
                         <option key={i} value={option}>
@@ -171,9 +230,11 @@ function AddSkill() {
             <Multiselect
                 placeholder='Теги'
                 options={tags} 
+                selectedValues={tagsSelect}
                 onSelect={onSelect} // Function will trigger on select event
                 onRemove={onRemove} // Function will trigger on remove event
-                displayValue="name" // Property name to display in the dropdown options
+                displayValue="name"
+                disable={!roles.includes("ADMIN")}
             />
         </div>
         <div className="levelsBlockAdd">
@@ -186,22 +247,30 @@ function AddSkill() {
                     onClick={e => changeTab(i)}>Уровень {i+1}</div>
                 )
             })}
+            {roles.includes("ADMIN") &&
                 <button className='addSkillLevel'
                 onClick={addLevel}>+</button>
+            }
             </div>
             <input className='reqLevel' placeholder='Требования к уровню' 
-            value={requirements.at(currLevel)} onChange={e => requirementChanged(e.target.value)} />
+            value={requirements.at(currLevel)} onChange={e => requirementChanged(e.target.value)} 
+            disabled={!roles.includes("ADMIN")} />
             <input className='artefactLevel' placeholder='Возможные артефакты' 
-            value={artefacts[currLevel]} onChange={e => artefactChanged(e.target.value)} />
+            value={artefacts[currLevel]} onChange={e => artefactChanged(e.target.value)} 
+            disabled={!roles.includes("ADMIN")} />
             <input className='recomLevel' placeholder='Рекомендации' 
-            value={recommends.at(currLevel)} onChange={e => recommendChanged(e.target.value)} />
+            value={recommends.at(currLevel)} onChange={e => recommendChanged(e.target.value)}
+            disabled={!roles.includes("ADMIN")} />
         </div>
         <div className="resultBtnsAS">
             <button className='resultBtn' onClick={backClicked}>Назад</button>
-            <button className='resultBtn' onClick={saveClicked}>Сохранить</button>
+            {roles.includes("ADMIN") &&
+            <button className='resultBtn deleteBtn' onClick={deleteClicked}>Удалить</button>}
+            {roles.includes("ADMIN") &&
+            <button className='resultBtn' onClick={saveClicked}>Сохранить</button>}
         </div>
     </div>
     )
 }
 
-export default AddSkill
+export default SkillView
