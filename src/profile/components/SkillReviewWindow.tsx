@@ -6,14 +6,16 @@ import {
   Autocomplete,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { SkillReviewWindowProps } from './props';
+import { ProfileViewScenario } from './ProfileView';
 
 // TODO: Нужно ли переключение между навыками, не выключая предыдущего навыка (интуитивно понятно)?
 // Или сделать жесткое выполнение: не нажал cancel, save или next - не вышел (затемняя остальную область, чтобы не работала).
-const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, readOnly }: SkillReviewWindowProps) => {
+const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, approveFunc, declineFunc, scenario }: SkillReviewWindowProps) => {
   let currentData = initialData;
   const [skillInfo, setSkillInfo] = useState<any>()
   let getSkillInfo = () => {
-    fetch("http://localhost:8080/skills/" + initialData.id, {
+    fetch("http://localhost:8080/skills/" + initialData.skillId, {
       method: "GET",
       headers: {
         'Accept': '*/*',
@@ -32,12 +34,12 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
 
   useEffect(() => {
     getSkillInfo()
-  }, [initialData.id])
+  }, [initialData.skillId])
 
   useEffect(() => {
     setLevel(initialData.selfReviewGrade)
     setArtifact(initialData.artifact)
-  }, [initialData.id])
+  }, [initialData.skillId])
 
   const [level, setLevel] = useState<number>(initialData.selfReviewGrade)
   const [artifact, setArtifact] = useState<string>(initialData.artifact)
@@ -80,7 +82,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
               saveDataFunc(currentData);
             }}
             autoHighlight
-            readOnly={readOnly}
+            readOnly={scenario !== ProfileViewScenario.Edit}
           />
           <TextField
             multiline
@@ -101,27 +103,39 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
         multiline
         rows={4}
         InputProps={{
-          readOnly: readOnly,
+          readOnly: scenario !== ProfileViewScenario.Edit,
         }}
       />
       <TextField
-        // value={commentary}
-        // onChange={(e) => {
-        //   currentData.commmentary = e.target.value
-        //   setCommentary(e.target.value)
-        // }}
-        placeholder='Будет доступно позже'
+        value={commentary}
+        onChange={(e) => {
+          currentData.commentary = e.target.value
+          setCommentary(e.target.value)
+        }}
+        placeholder={scenario === ProfileViewScenario.Approve ? 'Комментарий' : 'Будет доступно после оценки'}
         multiline
         rows={4}
         InputProps={{
-          readOnly: readOnly,
+          readOnly: scenario !== ProfileViewScenario.Approve,
         }}
       />
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Button sx={{ mr: "auto" }} onClick={prevFunc}>Назад</Button>
         {/* TODO: Fix saveDataFunc - retrieve data from input fields. */}
-        {!readOnly &&
+        {scenario === ProfileViewScenario.Edit &&
           <Button onClick={() => { saveDataFunc(currentData); }}>Сохранить</Button>
+        }
+        {scenario === ProfileViewScenario.Approve &&
+          <Box sx={{ mr: 'auto', display: 'flex', flexDirection: 'row', columnGap: 1 }}>
+            <Button sx={{ bgcolor: '#f0fff0', borderRadius: 0 }}
+              onClick={() => { currentData.isApprove = true; approveFunc(currentData); }}>
+              Подтвердить
+            </Button>
+            <Button sx={{ bgcolor: '#fff0f0', borderRadius: 0 }}
+              onClick={() => { currentData.isApprove = false; saveDataFunc(currentData); }}>
+              Отклонить
+            </Button>
+          </Box>
         }
         <Button onClick={nextFunc}>Далее</Button>
       </Box>

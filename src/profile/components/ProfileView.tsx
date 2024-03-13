@@ -8,9 +8,9 @@ import React, { useEffect, useState } from 'react'
 import SkillLine from './SkillLine'
 import SkillReviewWindow from './SkillReviewWindow'
 import './popup.css'
+import { PopupProps } from './props'
 
 export enum ProfileViewScenario {
-  Create,
   View,
   Edit,
   Approve,
@@ -30,22 +30,18 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   const [skillReviewActive, setSkillReviewActive] = useState<boolean>(false)
   const [skillSelected, setSkillSelected] = useState<number>(-1)
 
-  const [forceSkillsKey, forceSkillsUpdate] = useState<number>(0)
+  const [forceSkillsKey, setForceSkillsKey] = useState<number>(0)
   const [commentary, setCommentary] = useState<string>('')
+
+  const forceSkillsRefresh = () => {
+    setForceSkillsKey(forceSkillsKey + 1)
+  }
 
   // TODO: How can I preserve the value of skillsData map after component reloading?
   const [skillsData, setSkillsData] = useState<Map<number, SkillReview>>(new Map<number, SkillReview>());
   const fillExistingSkillsData = () => {
     presetupData.skills.map((skill) => {
-      skillsData.set(skill.skillId, {
-        // Warning! TODO: id is SkillInfo id, and skillId is Skill id (different classes from backend). Leave one.
-        id: skill.skillId,
-        skillId: skill.skillId,
-        targetGrade: skill.targetGrade,
-        selfReviewGrade: skill.selfReviewGrade,
-        artifact: skill.artifact,
-        isApprove: skill.isApprove,
-      })
+      skillsData.set(skill.skillId, skill)
     });
     // Two arrays with skills. Should filter the big one with ids from small one.
     // Practical solution: put ids into set (map) and check for the presence of each in O(1).
@@ -85,6 +81,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
       unitType: presetupData.unitType,
       targetGradeByDefault: presetupData.targetGradeByDefault,
       skills: Array.from(skillsData.values()),
+      commentary: commentary,
     }
 
     fetch("http://localhost:8080/profiles", {
@@ -107,23 +104,96 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
       })
   }
 
-  const isReadOnly = () => {
-    return scenario === ProfileViewScenario.View
+  // const saveApprovedProfile = () => {
+  //   let skillsArr = Array.from(skillsData.values())
+  //   // TODO: Add to isAnyDone calculation commentaries inside SkillReviewWindow.
+  //   let isAnyDone = skillsArr.reduce((a, b) => a || b.isApprove, false) || commentary !== ''
+  //   let isAllDone = skillsArr.reduce((a, b) => a && b.isApprove, true)
+  //   let status: string
+  //   if (isAllDone) {
+  //     status = "DONE"
+  //   } else if (isAnyDone) {
+  //     status = "IN_PROGRESS"
+  //   } else {
+  //     status = "NEW"
+  //   }
+
+  //   let profileData: ProfileEdit = {
+  //     id: presetupData.id,
+  //     userLogin: presetupData.userLogin,
+  //     createdAt: presetupData.createdAt,
+  //     status: status,
+  //     skillType: presetupData.skillType,
+  //     unitType: presetupData.unitType,
+  //     targetGradeByDefault: presetupData.targetGradeByDefault,
+  //     skills: skillsArr,
+  //   }
+
+  //   fetch("http://localhost:8080/profiles", {
+  //     method: "PUT",
+  //     body: JSON.stringify(profileData),
+  //     headers: {
+  //       'Accept': '*/*',
+  //       'Content-Type': 'application/json',
+  //       'Authorization': localStorage.getItem('token'),
+  //     },
+  //   }
+  //   ).then(res => res.json())
+  //     .then(response => {
+  //       console.log('existing profile successfully edited')
+  //       console.log(response)
+  //       nextFunc()
+  //     })
+  //     .catch(er => {
+  //       console.log(er.message)
+  //     })
+  // }
+
+  const approveProfile = () => {
+    let approveData: ApprovePost = {
+      profileId: presetupData.id,
+      skills: Array.from(skillsData.values()).map((v) => ({
+        skillId: v.skillId,
+        isApprove: v.isApprove,
+        commentary: v.commentary,
+      })),
+      commentary: commentary,
+    }
+
+    fetch("http://localhost:8080/profiles/approve", {
+      method: "POST",
+      body: JSON.stringify(approveData),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token'),
+      },
+    }
+    ).then(res => res.json())
+      .then(response => {
+        console.log(response)
+        nextFunc()
+      })
+      .catch(er => {
+        console.log(er.message)
+      })
   }
 
-  // TODO: After implementing ownership of profile and retrieving id of user from client,
-  // there will be some more option to allow Edit Scenario.
-  //   if (scenario == Scenario.View && 
-  //     profile.ownerId == (localStorage.getItem("name") || "name") &&
-  //     profile.status != 'READY' && profile.status != 'ARCHIVE') {
-  //     scenario = Scenario.Edit
-  //   }
-  // }, [])
+  const saveProfile = () => {
+    if (scenario === ProfileViewScenario.Edit) {
+      return saveExistingProfile()
+    } else if (scenario === ProfileViewScenario.Approve) {
+      return approveProfile()
+    }
+  }
+
   if (scenario === ProfileViewScenario.View &&
-    presetupData.userLogin == localStorage.getItem("name") &&
-    presetupData.status != 'DONE' &&
-    presetupData.status != 'ARCHIVE') {
+    presetupData.userLogin === localStorage.getItem("name") &&
+    presetupData.status !== 'DONE' &&
+    presetupData.status !== 'ARCHIVE') {
     scenario = ProfileViewScenario.Edit
+  } else if (presetupData.userLogin !== localStorage.getItem("name")) {
+    scenario = ProfileViewScenario.Approve
   }
 
   useEffect(() => {
@@ -151,6 +221,11 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                             }}
                             targetLevel={skillsData.get(skill.id).targetGrade}
                             level={skillsData.get(skill.id).selfReviewGrade}
+                            approved={
+                              scenario === ProfileViewScenario.Approve &&
+                                skillsData.get(skill.id).isApprove === null
+                                ? undefined : skillsData.get(skill.id).isApprove
+                            }
                           />
                         );
                       })
@@ -159,7 +234,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                   </Stack>
                 </Box>
                 <TextField
-                  placeholder="Будет доступно позже"
+                  placeholder={scenario === ProfileViewScenario.Approve ? 'Комментарий' : 'Будет доступно после оценки'}
                   multiline
                   minRows={4}
                   maxRows={8}
@@ -167,13 +242,13 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                   value={commentary}
                   onChange={(e) => { setCommentary(e.target.value) }}
                   InputProps={{
-                    readOnly: isReadOnly(),
+                    readOnly: scenario !== ProfileViewScenario.Approve,
                   }}
                 />
                 <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
                   <Button onClick={cancelFunc}>Назад</Button>
                   {scenario !== ProfileViewScenario.View &&
-                    <Button onClick={saveExistingProfile}>Сохранить</Button>
+                    <Button onClick={saveProfile}>Сохранить</Button>
                   }
                 </Box>
               </Stack>
@@ -181,8 +256,8 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                 <SkillReviewWindow
                   initialData={skillsData.get(skillSelected)}
                   saveDataFunc={(data) => {
-                    skillsData.set(data.id, data);
-                    forceSkillsUpdate(forceSkillsKey + 1)
+                    skillsData.set(data.skillId, data);
+                    forceSkillsRefresh()
                   }}
                   prevFunc={() => {
                     let i = availableSkills.findIndex((skill) => skill.id === skillSelected)
@@ -200,7 +275,13 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                       setSkillSelected(availableSkills[i + 1].id);
                     }
                   }}
-                  readOnly={isReadOnly()}
+                  approveFunc={() => {
+                    forceSkillsRefresh()
+                  }}
+                  declineFunc={() => {
+                    forceSkillsRefresh()
+                  }}
+                  scenario={scenario}
                 />
                 :
                 <Stack spacing={1} sx={{ minWidth: 200, minHeight: 300, flexGrow: 6, width: 0 }}>

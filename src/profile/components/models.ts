@@ -1,38 +1,11 @@
-interface SkillProps {
-  name: string;
-  onClick: () => void;
-  targetLevel: number;
-  level: number;
-}
-
-interface SkillReviewWindowProps {
-  initialData: SkillReview;
-  saveDataFunc: (data: SkillReview) => void;
-  prevFunc: () => void;
-  nextFunc: () => void;
-  readOnly: boolean;
-}
-
 interface SkillReview {
-  id: number,
   skillId: number,
   artifact: string,
   targetGrade: number,
   selfReviewGrade: number,
   isApprove: boolean,
+  commentary: string,
 }
-
-interface PopupProps {
-  cancelFunc: () => void;
-  nextFunc?: (outputValues?: any) => void;
-  inputValues?: any;
-}
-
-// interface ProfilePresetupProps {
-//   cancelFunc: () => void;
-//   nextFunc: (profileId: number) => void;
-//   inputValues?: any;
-// }
 
 interface ProfileGet {
   id: string,
@@ -43,13 +16,14 @@ interface ProfileGet {
   unitType: string,
   targetGradeByDefault: number,
   skills: {
-    id: number,
     skillId: number,
     artifact: string,
     targetGrade: number,
     selfReviewGrade: number,
     isApprove: boolean,
-  }[]
+    commentary: string,
+  }[],
+  commentary: string,
 }
 
 interface ProfileCreate {
@@ -74,13 +48,14 @@ interface ProfileEdit {
   unitType: string,
   targetGradeByDefault: number,
   skills: {
-    id: number,
     skillId: number,
     artifact: string,
     targetGrade: number,
     selfReviewGrade: number,
     isApprove: boolean,
-  }[]
+    commentary: string,
+  }[],
+  commentary: string,
 }
 
 interface ProfileMenuListActions {
@@ -110,4 +85,14 @@ interface SkillGet {
       recommendation: string,
     }
   ]
+}
+
+interface ApprovePost {
+  profileId: string,
+  skills: {
+    skillId: number,
+    isApprove: boolean,
+    commentary: string
+  }[]
+  commentary: string,
 }

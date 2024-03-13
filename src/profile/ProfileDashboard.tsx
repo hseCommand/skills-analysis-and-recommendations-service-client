@@ -218,7 +218,7 @@ const ProfileDashboard = () => {
           }}
           nextFunc={async (profileId: string) => {
             setProfileViewInputValues({
-              scenario: ProfileViewScenario.Create,
+              scenario: ProfileViewScenario.View,
               payload: await getProfileData(profileId)
             })
             forceTableRefresh()
