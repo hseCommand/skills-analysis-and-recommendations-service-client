@@ -35,14 +35,13 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
   }, [initialData.id])
 
   useEffect(() => {
-    setLevel(initialData.level)
+    setLevel(initialData.selfReviewGrade)
     setArtifact(initialData.artifact)
-    setCommentary(initialData.commmentary)
   }, [initialData.id])
 
-  const [level, setLevel] = useState<number>(initialData.level)
+  const [level, setLevel] = useState<number>(initialData.selfReviewGrade)
   const [artifact, setArtifact] = useState<string>(initialData.artifact)
-  const [commentary, setCommentary] = useState<string>(initialData.commmentary)
+  const [commentary, setCommentary] = useState<string>()
 
   {/* TODO: Consider using Suspense component to wait until data is fetched. */ }
   if (!skillInfo) {
@@ -60,13 +59,13 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Stack spacing={1} sx={{ flexGrow: 1, width: 0 }}>
           {/* TODO: Целевой уровень - обработать ситуацию, когда у навыка нет такого уровня (взять лучший - ближайший) */}
-          <TextField value={'Целевой уровень: ' + initialData.targetLevel} disabled></TextField>
+          <TextField value={'Целевой уровень: ' + initialData.targetGrade} disabled></TextField>
           <TextField
             multiline
             disabled
             rows={4}
             sx={{ width: "100%" }}
-            value={skillInfo.skillGrades[initialData.targetLevel - 1].requirements}
+            value={skillInfo.skillGrades[initialData.targetGrade - 1].requirements}
           />
         </Stack>
         <Stack spacing={1} sx={{ flexGrow: 1, width: 0 }}>
@@ -74,10 +73,10 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
             disablePortal
             options={skillInfo.skillGrades.map((grade: any) => grade.gradeNumber.toString())}
             renderInput={(params) => <TextField {...params} label="Выбери свой уровень" />}
-            value={level == -1 ? '' : level.toString()}
+            value={level === null ? '' : level.toString()}
             onChange={(e, newValue) => {
               setLevel(+newValue);
-              currentData.level = +newValue;
+              currentData.selfReviewGrade = +newValue;
               saveDataFunc(currentData);
             }}
             autoHighlight
@@ -88,7 +87,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
             disabled
             rows={4}
             sx={{ width: "100%" }}
-            value={level !== -1 ? skillInfo.skillGrades[level - 1].requirements : "..."}
+            value={level === null ? '...' : skillInfo.skillGrades[level - 1].requirements}
           />
         </Stack>
       </Box>
@@ -106,12 +105,12 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
         }}
       />
       <TextField
-        value={commentary}
-        onChange={(e) => {
-          currentData.commmentary = e.target.value
-          setCommentary(e.target.value)
-        }}
-        placeholder='Комментарий'
+        // value={commentary}
+        // onChange={(e) => {
+        //   currentData.commmentary = e.target.value
+        //   setCommentary(e.target.value)
+        // }}
+        placeholder='Будет доступно позже'
         multiline
         rows={4}
         InputProps={{

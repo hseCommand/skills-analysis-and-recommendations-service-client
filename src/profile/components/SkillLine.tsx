@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 
 const SkillLine = ({ name, onClick, targetLevel, level }: SkillProps) => {
   let color: string;
-  if (level == -1) {
+  if (level === null) {
     color = '#bbb'
   } else if (targetLevel - level <= 0) {
     color = '#87f5a5'
@@ -30,11 +30,18 @@ const SkillLine = ({ name, onClick, targetLevel, level }: SkillProps) => {
       }
     }}>
       <Box sx={{ flexGrow: 8, width: 0 }}>
-        <span style={{ "height": "10px", "width": "10px", "backgroundColor": color, "borderRadius": "50%", "display": "inline-block", "marginRight": "12px" }}></span>
+        <span style={{
+          height: "10px",
+          width: "10px",
+          backgroundColor: color,
+          borderRadius: "50%",
+          display: "inline-block",
+          marginRight: "12px"
+        }}></span>
         {name}
       </Box>
       <Box sx={{ flexGrow: 2, width: 0 }}>
-        {level == -1 ? '?' : level}
+        {level === null ? targetLevel : level}
       </Box>
       <Box sx={{ ml: "auto", width: 0 }}>
         e

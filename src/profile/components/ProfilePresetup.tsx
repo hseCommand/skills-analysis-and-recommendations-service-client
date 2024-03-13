@@ -24,7 +24,7 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
   const [skillType, setSkillType] = useState<string>()
   const [unitType, setUnitType] = useState<string>()
   const [tags, setTags] = useState<string[]>()
-  const [level, setLevel] = useState<string>()
+  const [targetGradeByDefault, setTargetGradeByDefault] = useState<string>()
 
   useEffect(() => {
     Promise.all([getAllSkillTypes(), getAllUnitTypes(), getAllTags()])
@@ -35,14 +35,71 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
       })
   }, [])
 
-  const aggregatePresetupData = () => {
-    let data: ProfilePresetupReturn = {
+  async function getFilteredSkills(): Promise<SkillGet[]> {
+    return await fetch("http://localhost:8080/skills/filter", {
+      method: "POST",
+      body: JSON.stringify({
+        "skillTypes": [skillType],
+        "unitTypes": [unitType],
+        "tags": tags,
+      }),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token')
+      },
+    }
+    ).then(res => res.json())
+      .then(response => {
+        return response
+      })
+      .catch(er => {
+        console.log(er.message)
+      })
+  }
+
+  async function getTargetGrades(): Promise<{ skillId: number, targetGrade: number }[]> {
+    let filteredSkills = await getFilteredSkills()
+    return filteredSkills.map((skill) => ({
+      skillId: skill.id,
+      // This weird function finds suitable targetGrade for each skill. 
+      targetGrade: Math.min(skill.skillGrades.reduce((a, b) => Math.max(a, b.gradeNumber), 1), +targetGradeByDefault)
+    }))
+  }
+
+  async function saveNewProfile(): Promise<string> {
+    let profileData: ProfileCreate = {
+      status: "NEW",
+      userLogin: localStorage.getItem('name'),
       skillType: skillType,
       unitType: unitType,
-      tags: tags,
-      targetGradeByDefault: +level,
+      targetGradeByDefault: +targetGradeByDefault,
+      skills: (await getTargetGrades()).map((v) => ({
+        skillId: v.skillId,
+        artifact: "",
+        targetGrade: v.targetGrade,
+      })),
     }
-    return data
+
+    return await fetch("http://localhost:8080/profiles", {
+      method: "POST",
+      body: JSON.stringify(profileData),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token'),
+      },
+    }
+    ).then(res => res.json())
+      .then(response => {
+        console.log('new profile successfully stored')
+        console.log(response)
+        return (response as ProfileGet).id
+      })
+      .catch(er => {
+        console.log(er.message)
+        return ""
+      })
   }
 
   return (
@@ -85,13 +142,16 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
             disablePortal
             options={levelsSelectLabels}
             renderInput={(params) => <TextField {...params} label="Уровень/грейд" />}
-            value={level}
+            value={targetGradeByDefault}
             autoHighlight
-            onChange={(e, newValue) => { setLevel(newValue) }}
+            onChange={(e, newValue) => { setTargetGradeByDefault(newValue) }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Button onClick={cancelFunc}>Назад</Button>
-            <Button onClick={() => nextFunc(aggregatePresetupData())}>Далее</Button>
+            <Button onClick={async () => {
+              let profileId = await saveNewProfile()
+              nextFunc(profileId)
+            }}>Далее</Button>
           </Box>
         </Stack>
       </Box>

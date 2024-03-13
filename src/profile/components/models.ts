@@ -6,26 +6,20 @@ interface SkillProps {
 }
 
 interface SkillReviewWindowProps {
-  initialData: InitialDataSkillReview;
-  saveDataFunc: (data: InitialDataSkillReview) => void;
+  initialData: SkillReview;
+  saveDataFunc: (data: SkillReview) => void;
   prevFunc: () => void;
   nextFunc: () => void;
   readOnly: boolean;
 }
 
-interface InitialDataSkillReview {
-  id: number;
-  targetLevel: number;
-  level: number;
-  artifact: string;
-  commmentary: string;
-}
-
-interface ProfilePresetupReturn {
-  skillType: string;
-  unitType: string;
-  tags: string[];
-  targetGradeByDefault: number;
+interface SkillReview {
+  id: number,
+  skillId: number,
+  artifact: string,
+  targetGrade: number,
+  selfReviewGrade: number,
+  isApprove: boolean,
 }
 
 interface PopupProps {
@@ -34,22 +28,33 @@ interface PopupProps {
   inputValues?: any;
 }
 
+// interface ProfilePresetupProps {
+//   cancelFunc: () => void;
+//   nextFunc: (profileId: number) => void;
+//   inputValues?: any;
+// }
+
 interface ProfileGet {
   id: string,
+  userLogin: string,
   createdAt: string,
   status: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
   skills: {
+    id: number,
     skillId: number,
     artifact: string,
     targetGrade: number,
+    selfReviewGrade: number,
+    isApprove: boolean,
   }[]
 }
 
 interface ProfileCreate {
   status: string,
+  userLogin: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
@@ -62,15 +67,19 @@ interface ProfileCreate {
 
 interface ProfileEdit {
   id: string,
+  userLogin: string,
   createdAt: string,
   status: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
   skills: {
+    id: number,
     skillId: number,
     artifact: string,
-    targetGrade: number
+    targetGrade: number,
+    selfReviewGrade: number,
+    isApprove: boolean,
   }[]
 }
 
@@ -85,20 +94,6 @@ interface ProfileMenuListActions {
 //   IN_PROGRESS,
 //   ARCHIVE,
 // }
-
-interface ExistingProfileData {
-  id: string,
-  createdAt: string,
-  status: string,
-  skillType: string,
-  unitType: string,
-  targetGradeByDefault: number,
-  skills: {
-    skillId: number,
-    artifact: string,
-    targetGrade: number,
-  }[]
-}
 
 interface SkillGet {
   id: number,

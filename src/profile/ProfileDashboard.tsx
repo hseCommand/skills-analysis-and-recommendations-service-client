@@ -14,10 +14,10 @@ import {
   Button as MButton,
   TablePagination,
 } from '@mui/material';
-import GeneralProfileCreationComponent from './GeneralProfileCreationComponent';
 import ProfileMenuList from './components/ProfileMenuList';
 import ProfileView, { ProfileViewInputValues, ProfileViewScenario } from './components/ProfileView';
 import { getAllSkillTypes } from './api/skills';
+import ProfilePrestup from './components/ProfilePresetup';
 
 const ProfileDashboard = () => {
   // TODO: Wouldn't filtering inside table headers be better?
@@ -59,7 +59,7 @@ const ProfileDashboard = () => {
   }, [forceTableKey])
 
   async function deleteProfile(id: string): Promise<void> {
-    fetch("http://localhost:8080/profiles/" + id, {
+    return await fetch("http://localhost:8080/profiles/" + id, {
       method: "DELETE",
       headers: {
         'Accept': '*/*',
@@ -76,8 +76,8 @@ const ProfileDashboard = () => {
 
   async function archiveProfile(profile: ProfileEdit): Promise<void> {
     profile.status = "ARCHIVE"
-    
-    await fetch("http://localhost:8080/profiles", {
+
+    return await fetch("http://localhost:8080/profiles", {
       method: "PUT",
       body: JSON.stringify(profile),
       headers: {
@@ -153,9 +153,7 @@ const ProfileDashboard = () => {
                     key={profile.id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell component="th" scope="row">
-                      {'???'}
-                    </TableCell>
+                    <TableCell component="th" scope="row">{profile.userLogin}</TableCell>
                     <TableCell align="right">{profile.skillType}</TableCell>
                     <TableCell align="right">{profile.unitType}</TableCell>
                     <TableCell align="right">{profile.createdAt}</TableCell>
@@ -202,15 +200,21 @@ const ProfileDashboard = () => {
           <MButton onClick={() => { setProfileCreationActive(true); }}>Создать селф-ревью</MButton>
         </Box>
       </MStack>
-      {
-        profileCreationActive ?
-          <GeneralProfileCreationComponent cancelFunc={() => {
-            setProfileCreationActive(false);
+      {profileCreationActive &&
+        <ProfilePrestup
+          cancelFunc={() => {
+            setProfileCreationActive(false)
+          }}
+          nextFunc={async (profileId: string) => {
+            setProfileViewInputValues({
+              scenario: ProfileViewScenario.Create,
+              payload: await getProfileData(profileId)
+            })
             forceTableRefresh()
-          }} />
-          : ""
-      }
-      {/* TODO: Remove hardcoded values. */}
+            setProfileCreationActive(false)
+            setProfileViewActive(true)
+          }}
+        />}
       {profileViewActive &&
         <ProfileView
           cancelFunc={() => { setProfileViewActive(false); }}
