@@ -31,7 +31,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   const [skillSelected, setSkillSelected] = useState<number>(-1)
 
   const [forceSkillsKey, setForceSkillsKey] = useState<number>(0)
-  const [commentary, setCommentary] = useState<string>('')
+  const [profileComment, setProfileComment] = useState<string>('')
 
   const forceSkillsRefresh = () => {
     setForceSkillsKey(forceSkillsKey + 1)
@@ -81,7 +81,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
       unitType: presetupData.unitType,
       targetGradeByDefault: presetupData.targetGradeByDefault,
       skills: Array.from(skillsData.values()),
-      commentary: commentary,
+      profileComment: profileComment,
     }
 
     fetch("http://localhost:8080/profiles", {
@@ -104,63 +104,20 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
       })
   }
 
-  // const saveApprovedProfile = () => {
-  //   let skillsArr = Array.from(skillsData.values())
-  //   // TODO: Add to isAnyDone calculation commentaries inside SkillReviewWindow.
-  //   let isAnyDone = skillsArr.reduce((a, b) => a || b.isApprove, false) || commentary !== ''
-  //   let isAllDone = skillsArr.reduce((a, b) => a && b.isApprove, true)
-  //   let status: string
-  //   if (isAllDone) {
-  //     status = "DONE"
-  //   } else if (isAnyDone) {
-  //     status = "IN_PROGRESS"
-  //   } else {
-  //     status = "NEW"
-  //   }
-
-  //   let profileData: ProfileEdit = {
-  //     id: presetupData.id,
-  //     userLogin: presetupData.userLogin,
-  //     createdAt: presetupData.createdAt,
-  //     status: status,
-  //     skillType: presetupData.skillType,
-  //     unitType: presetupData.unitType,
-  //     targetGradeByDefault: presetupData.targetGradeByDefault,
-  //     skills: skillsArr,
-  //   }
-
-  //   fetch("http://localhost:8080/profiles", {
-  //     method: "PUT",
-  //     body: JSON.stringify(profileData),
-  //     headers: {
-  //       'Accept': '*/*',
-  //       'Content-Type': 'application/json',
-  //       'Authorization': localStorage.getItem('token'),
-  //     },
-  //   }
-  //   ).then(res => res.json())
-  //     .then(response => {
-  //       console.log('existing profile successfully edited')
-  //       console.log(response)
-  //       nextFunc()
-  //     })
-  //     .catch(er => {
-  //       console.log(er.message)
-  //     })
-  // }
-
   const approveProfile = () => {
     let approveData: ApprovePost = {
       profileId: presetupData.id,
-      skills: Array.from(skillsData.values()).map((v) => ({
+      profileComment: profileComment,
+      reviewSkills: Array.from(skillsData.values()).map((v) => ({
         skillId: v.skillId,
         isApprove: v.isApprove,
-        commentary: v.commentary,
+        skillComment: v.skillComment,
       })),
-      commentary: commentary,
     }
 
-    fetch("http://localhost:8080/profiles/approve", {
+    console.log(approveData)
+
+    fetch("http://localhost:8080/profiles/review", {
       method: "POST",
       body: JSON.stringify(approveData),
       headers: {
@@ -197,6 +154,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   }
 
   useEffect(() => {
+    setProfileComment(presetupData.profileComment)
     fillExistingSkillsData()
   }, [])
 
@@ -239,8 +197,8 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                   minRows={4}
                   maxRows={8}
                   sx={{ width: "100%" }}
-                  value={commentary}
-                  onChange={(e) => { setCommentary(e.target.value) }}
+                  value={profileComment}
+                  onChange={(e) => { setProfileComment(e.target.value) }}
                   InputProps={{
                     readOnly: scenario !== ProfileViewScenario.Approve,
                   }}

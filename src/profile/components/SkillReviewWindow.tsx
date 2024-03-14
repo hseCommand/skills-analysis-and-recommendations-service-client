@@ -39,11 +39,12 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
   useEffect(() => {
     setLevel(initialData.selfReviewGrade)
     setArtifact(initialData.artifact)
+    setSkillComment(initialData.skillComment)
   }, [initialData.skillId])
 
   const [level, setLevel] = useState<number>(initialData.selfReviewGrade)
   const [artifact, setArtifact] = useState<string>(initialData.artifact)
-  const [commentary, setCommentary] = useState<string>()
+  const [skillComment, setSkillComment] = useState<string>()
 
   {/* TODO: Consider using Suspense component to wait until data is fetched. */ }
   if (!skillInfo) {
@@ -107,10 +108,10 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
         }}
       />
       <TextField
-        value={commentary}
+        value={skillComment}
         onChange={(e) => {
-          currentData.commentary = e.target.value
-          setCommentary(e.target.value)
+          currentData.skillComment = e.target.value
+          setSkillComment(e.target.value)
         }}
         placeholder={scenario === ProfileViewScenario.Approve ? 'Комментарий' : 'Будет доступно после оценки'}
         multiline

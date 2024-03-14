@@ -4,7 +4,7 @@ interface SkillReview {
   targetGrade: number,
   selfReviewGrade: number,
   isApprove: boolean,
-  commentary: string,
+  skillComment: string,
 }
 
 interface ProfileGet {
@@ -15,15 +15,15 @@ interface ProfileGet {
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
+  profileComment: string,
   skills: {
     skillId: number,
     artifact: string,
     targetGrade: number,
     selfReviewGrade: number,
     isApprove: boolean,
-    commentary: string,
+    skillComment: string,
   }[],
-  commentary: string,
 }
 
 interface ProfileCreate {
@@ -47,15 +47,15 @@ interface ProfileEdit {
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
+  profileComment: string,
   skills: {
     skillId: number,
     artifact: string,
     targetGrade: number,
     selfReviewGrade: number,
     isApprove: boolean,
-    commentary: string,
+    skillComment: string,
   }[],
-  commentary: string,
 }
 
 interface ProfileMenuListActions {
@@ -89,10 +89,10 @@ interface SkillGet {
 
 interface ApprovePost {
   profileId: string,
-  skills: {
+  profileComment: string,
+  reviewSkills: {
     skillId: number,
     isApprove: boolean,
-    commentary: string
+    skillComment: string
   }[]
-  commentary: string,
 }

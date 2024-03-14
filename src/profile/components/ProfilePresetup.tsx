@@ -12,6 +12,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import './popup.css'
 import { getAllSkillTypes, getAllUnitTypes, getAllTags } from '../api/skills'
+import { PopupProps } from './props'
 
 const levelsSelectLabels: string[] = Array.from(Array(8).keys()).map((_, i) => (1 + i).toString())
 
