@@ -13,6 +13,7 @@ import {
   TextField,
   Button as MButton,
   TablePagination,
+  TableSortLabel,
 } from '@mui/material';
 import ProfileMenuList from './components/ProfileMenuList';
 import ProfileView, { ProfileViewInputValues, ProfileViewScenario } from './components/ProfileView';
@@ -21,12 +22,12 @@ import ProfilePresetup from './components/ProfilePresetup';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
-  
+
   const navigate = useNavigate()
   // TODO: Wouldn't filtering inside table headers be better?
   const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
   const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>()
-  const [profiles, setProfiles] = useState<any>()
+  const [profiles, setProfiles] = useState<ProfileGet[]>()
 
   // TODO: Consider looking at Context way of changing state in a parent-child components.
   const [profileCreationActive, setProfileCreationActive] = useState<boolean>(false)
@@ -40,12 +41,19 @@ const ProfileDashboard = () => {
     setForceTableKey(forceTableKey + 1)
   }
 
+  const [order, setOrder] = useState<string>('asc')
+
+  const handleRequestSort = (event: React.MouseEvent<unknown>) => {
+    const isAsc = order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+  };
+
   useEffect(() => {
     getAllSkillTypes().then((skillTypes) => { setSkillTypesSelectLabels(skillTypes) })
   }, [])
 
   useEffect(() => {
-    
+
     fetch("http://localhost:8080/profiles/all", {
       method: "GET",
       headers: {
@@ -124,6 +132,27 @@ const ProfileDashboard = () => {
       })
   }
 
+  function descendingComparator(a: ProfileGet, b: ProfileGet) {
+    let aDate = Date.parse(a.createdAt)
+    let bDate = Date.parse(b.createdAt)
+    if (bDate < aDate) {
+      return -1;
+    }
+    if (bDate > aDate) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const visibleRows = React.useMemo(
+    () => {
+      return (profiles ? profiles.slice().sort(
+        (a, b) => (order === 'desc' ? 1 : -1) * descendingComparator(a, b)) : []
+      )
+    },
+    [order, profiles],
+  );
+
   return (
     <div>
       <MStack key={forceTableKey} spacing={2} sx={{ marginY: 4, marginX: 2 }}>
@@ -140,20 +169,12 @@ const ProfileDashboard = () => {
         />
         <TableContainer component={Paper} sx={{ minHeight: 200, boxShadow: 'none' }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Название команды / ФИО</TableCell>
-                <TableCell align="right">Тип навыка</TableCell>
-                <TableCell align="right">Тип Юнита</TableCell>
-                {/* TODO: Add table sorting by clicking on the datetime header */}
-                <TableCell align="right">Дата заполнения</TableCell>
-                <TableCell align="right">Уровень</TableCell>
-                <TableCell align="right">Статус</TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow>
-            </TableHead>
+            <EnhancedTableHead
+              order={order}
+              onRequestSort={handleRequestSort}
+            />
             <TableBody>
-              {profiles && profiles.map((profile: ProfileGet) => {
+              {visibleRows && visibleRows.map((profile: ProfileGet) => {
                 if (profilesSkillTypeFilter !== null &&
                   profilesSkillTypeFilter !== undefined &&
                   profile.skillType !== profilesSkillTypeFilter) {
@@ -198,14 +219,14 @@ const ProfileDashboard = () => {
           </Table>
           {/* TODO: Pagination is not working. */}
           {/* <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={profiles ? profiles.length : 0}
-                            rowsPerPage={profilesRowsPerPage}
-                            page={profilesPage}
-                            onPageChange={() => { setProfilesPage(profilesPage + 1) }}
-                            onRowsPerPageChange={(e) => { setProfilesRowsPerPage(+e.target.value) }}
-                        /> */}
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={profiles ? profiles.length : 0}
+              rowsPerPage={profilesRowsPerPage}
+              page={profilesPage}
+              onPageChange={() => { setProfilesPage(profilesPage + 1) }}
+              onRowsPerPageChange={(e) => { setProfilesRowsPerPage(+e.target.value) }}
+          /> */}
         </TableContainer>
         <Box sx={{ alignSelf: 'flex-end', paddingRight: 4 }}>
           <MButton onClick={() => { setProfileCreationActive(true); }}>Создать селф-ревью</MButton>
@@ -233,6 +254,45 @@ const ProfileDashboard = () => {
           inputValues={profileViewInputValues}
         />}
     </div>
+  )
+}
+
+interface EnhancedTableHeadProps {
+  order: any,
+  onRequestSort: any,
+}
+
+const EnhancedTableHead = ({ order, onRequestSort }: EnhancedTableHeadProps) => {
+  const createSortHandler = () => (event: React.MouseEvent<unknown>) => {
+    onRequestSort(event);
+  };
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell>Название команды / ФИО</TableCell>
+        <TableCell align="right">Тип навыка</TableCell>
+        <TableCell align="right">Тип Юнита</TableCell>
+        <TableCell
+          align="right"
+          sortDirection={order}
+        >
+          <TableSortLabel
+            active={true}
+            direction={order}
+            onClick={createSortHandler()}
+          >
+            Дата заполнения
+            {/* <Box component="span" sx={visuallyHidden}>
+              {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+            </Box> */}
+          </TableSortLabel>
+        </TableCell>
+        <TableCell align="right">Уровень</TableCell>
+        <TableCell align="right">Статус</TableCell>
+        <TableCell align="right"></TableCell>
+      </TableRow>
+    </TableHead>
   )
 }
 
