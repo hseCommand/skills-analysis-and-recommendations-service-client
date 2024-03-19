@@ -155,7 +155,7 @@ const ProfileDashboard = () => {
 
   return (
     <div>
-      <MStack key={forceTableKey} spacing={2} sx={{ marginY: 4, marginX: 2 }}>
+      <MStack key={forceTableKey} spacing={2} sx={{ paddingY: 4, paddingX: 2 }} className="containerUnderTabs">
         <Autocomplete
           sx={{ paddingLeft: 2, maxWidth: 350 }}
           disablePortal
@@ -283,9 +283,6 @@ const EnhancedTableHead = ({ order, onRequestSort }: EnhancedTableHeadProps) => 
             onClick={createSortHandler()}
           >
             Дата заполнения
-            {/* <Box component="span" sx={visuallyHidden}>
-              {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-            </Box> */}
           </TableSortLabel>
         </TableCell>
         <TableCell align="right">Уровень</TableCell>

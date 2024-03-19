@@ -206,7 +206,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                 <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
                   <Button onClick={cancelFunc}>Назад</Button>
                   {scenario !== ProfileViewScenario.View &&
-                    <Button onClick={saveProfile}>Сохранить</Button>
+                    <Button onClick={saveProfile}>{scenario === ProfileViewScenario.Approve ? 'Сохранить оценку' : 'Сохранить'}</Button>
                   }
                 </Box>
               </Stack>
@@ -242,7 +242,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                   scenario={scenario}
                 />
                 :
-                <Stack spacing={1} sx={{ minWidth: 200, minHeight: 300, flexGrow: 6, width: 0 }}>
+                <Stack spacing={1} sx={{ width: 0, minWidth: 300, minHeight: 300, flexGrow: 6, padding: 2, alignSelf: "flex-start" }}>
                 </Stack>
               }
             </Box>

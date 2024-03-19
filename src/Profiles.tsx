@@ -168,14 +168,24 @@ function Profiles() {
                 style={{ display: 'block', position: 'initial' }}
             >
             
-            <Button onClick={() => {
+            {/* <Button onClick={() => {
                 localStorage.clear()
                 navigate("/")
             }}>Выйти</Button>
 
             <div className="profileHeader">
                 <div className="username">{name}</div>
+            </div> */}
+
+            <div className="profileHeader">
+                <div className="headerItem">{name}</div>
+                <div className="headerItem">/</div>
+                <Button className="headerItem exitButtonHeader" onClick={() => {
+                    localStorage.clear()
+                    navigate("/")
+                }}>Выйти</Button>
             </div>
+
             <div className="profileBtns">
                 <div className="profileBtn selected" id="reviews" 
                     onClick={e => changeTab("reviews")}>Мои анкеты</div>
@@ -184,7 +194,7 @@ function Profiles() {
             </div>
 
             {choosen == "skills" &&
-            <div className="skillsProfile">
+            <div className="skillsProfile containerUnderTabs">
                 <div className="skillSearch">
                     <input className='skillnameSearch' placeholder='Поиск по названию навыка'
                     value={nameSkill} onChange={e => nameSkillSet(e.target.value)}></input>
