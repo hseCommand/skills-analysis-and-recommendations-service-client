@@ -9,8 +9,9 @@ import React, { useEffect, useState } from 'react'
 import { SkillReviewWindowProps } from './props';
 import { ProfileViewScenario } from './ProfileView';
 
-// TODO: Нужно ли переключение между навыками, не выключая предыдущего навыка (интуитивно понятно)?
-// Или сделать жесткое выполнение: не нажал cancel, save или next - не вышел (затемняя остальную область, чтобы не работала).
+// Function saveDataFunc is now useless since initialData is passed by ref, 
+// so all data is saved automatically.
+// The only purpose it has now - refreshing outer skill list.
 const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, approveFunc, declineFunc, scenario }: SkillReviewWindowProps) => {
   let currentData = initialData;
   const [skillInfo, setSkillInfo] = useState<any>()
@@ -25,7 +26,6 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
     ).then(res => res.json())
       .then(response => {
         setSkillInfo(response)
-        console.log(response)
       })
       .catch(er => {
         console.log(er.message)
@@ -37,16 +37,16 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
   }, [initialData.skillId])
 
   useEffect(() => {
-    setLevel(initialData.selfReviewGrade)
+    setLevel(initialData.selfReviewGrade ? initialData.selfReviewGrade.toString() : null)
     setArtifact(initialData.artifact)
-    setSkillComment(initialData.skillComment)
+    setSkillComment(initialData.skillComment || '')
   }, [initialData.skillId])
 
-  const [level, setLevel] = useState<number>(initialData.selfReviewGrade)
-  const [artifact, setArtifact] = useState<string>(initialData.artifact)
-  const [skillComment, setSkillComment] = useState<string>()
+  const [level, setLevel] = useState<string>(null)
+  const [artifact, setArtifact] = useState<string>('')
+  const [skillComment, setSkillComment] = useState<string>('')
 
-  {/* TODO: Consider using Suspense component to wait until data is fetched. */ }
+  // TODO: Consider using Suspense component to wait until data is fetched.
   if (!skillInfo) {
     return (
       <Stack spacing={1} sx={{ width: 0, minWidth: 300, minHeight: 300, flexGrow: 6, padding: 2, alignSelf: "flex-start" }}>
@@ -61,7 +61,6 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
       </Box>
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Stack spacing={1} sx={{ flexGrow: 1, width: 0 }}>
-          {/* TODO: Целевой уровень - обработать ситуацию, когда у навыка нет такого уровня (взять лучший - ближайший) */}
           <TextField value={'Целевой уровень: ' + initialData.targetGrade} disabled></TextField>
           <TextField
             multiline
@@ -76,10 +75,10 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
             disablePortal
             options={skillInfo.skillGrades.map((grade: any) => grade.gradeNumber.toString())}
             renderInput={(params) => <TextField {...params} label="Выбери свой уровень" />}
-            value={level === null ? '' : level.toString()}
+            value={level}
             onChange={(e, newValue) => {
-              setLevel(+newValue);
-              currentData.selfReviewGrade = +newValue;
+              setLevel(newValue);
+              currentData.selfReviewGrade = newValue ? +newValue : null;
               saveDataFunc(currentData);
             }}
             autoHighlight
@@ -90,7 +89,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
             disabled
             rows={4}
             sx={{ width: "100%" }}
-            value={level === null ? '...' : skillInfo.skillGrades[level - 1].requirements}
+            value={level === null ? '...' : skillInfo.skillGrades[+level - 1].requirements}
           />
         </Stack>
       </Box>
@@ -122,7 +121,6 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
       />
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Button sx={{ mr: "auto" }} onClick={prevFunc}>Назад</Button>
-        {/* TODO: Fix saveDataFunc - retrieve data from input fields. */}
         {scenario === ProfileViewScenario.Edit &&
           <Button onClick={() => { saveDataFunc(currentData); }}>Сохранить</Button>
         }
@@ -133,7 +131,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
               Подтвердить
             </Button>
             <Button sx={{ bgcolor: '#fff0f0', borderRadius: 0 }}
-              onClick={() => { currentData.isApprove = false; saveDataFunc(currentData); }}>
+              onClick={() => { currentData.isApprove = false; declineFunc(currentData); }}>
               Отклонить
             </Button>
           </Box>

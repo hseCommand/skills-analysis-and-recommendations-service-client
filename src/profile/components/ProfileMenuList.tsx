@@ -84,7 +84,7 @@ export default function ProfileMenuList({ deleteAction, archiveAction }: Profile
                   aria-labelledby="composition-button"
                   onKeyDown={handleListKeyDown}
                 >
-                  <MenuItem onClick={handleClose}>Поделиться</MenuItem>
+                  <MenuItem disabled onClick={handleClose}>Поделиться</MenuItem>
                   <MenuItem onClick={(e) => {
                     archiveAction()
                     handleClose(e)

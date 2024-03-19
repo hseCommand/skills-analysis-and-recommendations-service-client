@@ -16,16 +16,15 @@ import { PopupProps } from './props'
 
 const levelsSelectLabels: string[] = Array.from(Array(8).keys()).map((_, i) => (1 + i).toString())
 
-// TODO: Add error handling (specifically - empty fields).
-const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
+const ProfilePresetup = ({ cancelFunc, nextFunc }: PopupProps) => {
   const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
   const [unitTypesSelectLabels, setUnitTypesSelectLabels] = useState<string[]>([])
   const [tagsSelectLabels, setTagsSelectLabels] = useState<string[]>([])
 
-  const [skillType, setSkillType] = useState<string>()
-  const [unitType, setUnitType] = useState<string>()
-  const [tags, setTags] = useState<string[]>()
-  const [targetGradeByDefault, setTargetGradeByDefault] = useState<string>()
+  const [skillType, setSkillType] = useState<string>('')
+  const [unitType, setUnitType] = useState<string>(null)
+  const [tags, setTags] = useState<string[]>([])
+  const [targetGradeByDefault, setTargetGradeByDefault] = useState<string>(null)
 
   useEffect(() => {
     Promise.all([getAllSkillTypes(), getAllUnitTypes(), getAllTags()])
@@ -66,6 +65,12 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
       // This weird function finds suitable targetGrade for each skill. 
       targetGrade: Math.min(skill.skillGrades.reduce((a, b) => Math.max(a, b.gradeNumber), 1), +targetGradeByDefault)
     }))
+  }
+
+  function checkFieldsValidity() {
+    return skillType !== '' &&
+      unitType !== null &&
+      targetGradeByDefault !== null
   }
 
   async function saveNewProfile(): Promise<string> {
@@ -150,8 +155,12 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Button onClick={cancelFunc}>Назад</Button>
             <Button onClick={async () => {
-              let profileId = await saveNewProfile()
-              nextFunc(profileId)
+              if (checkFieldsValidity()) {
+                let profileId = await saveNewProfile()
+                nextFunc(profileId)
+              } else {
+                console.log('Some of ProfilePresetup fields are invalid.')
+              }
             }}>Далее</Button>
           </Box>
         </Stack>
@@ -160,4 +169,4 @@ const ProfilePrestup = ({ cancelFunc, nextFunc }: PopupProps) => {
   )
 }
 
-export default ProfilePrestup
+export default ProfilePresetup

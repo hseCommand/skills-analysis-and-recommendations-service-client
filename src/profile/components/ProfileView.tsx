@@ -115,8 +115,6 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
       })),
     }
 
-    console.log(approveData)
-
     fetch("http://localhost:8080/profiles/review", {
       method: "POST",
       body: JSON.stringify(approveData),
@@ -128,6 +126,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
     }
     ).then(res => res.json())
       .then(response => {
+        console.log('profile successfully reviewed')
         console.log(response)
         nextFunc()
       })
@@ -154,7 +153,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   }
 
   useEffect(() => {
-    setProfileComment(presetupData.profileComment)
+    setProfileComment(presetupData.profileComment || '')
     fillExistingSkillsData()
   }, [])
 
