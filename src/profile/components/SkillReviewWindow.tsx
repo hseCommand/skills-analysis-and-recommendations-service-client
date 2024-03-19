@@ -37,7 +37,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
   }, [initialData.skillId])
 
   useEffect(() => {
-    setLevel(initialData.selfReviewGrade ? initialData.selfReviewGrade.toString() : null)
+    setLevel(initialData.selfReviewGrade?.toString() || null)
     setArtifact(initialData.artifact)
     setSkillComment(initialData.skillComment || '')
   }, [initialData.skillId])

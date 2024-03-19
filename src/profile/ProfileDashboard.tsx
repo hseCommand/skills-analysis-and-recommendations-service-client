@@ -26,7 +26,7 @@ const ProfileDashboard = () => {
   const navigate = useNavigate()
   // TODO: Wouldn't filtering inside table headers be better?
   const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
-  const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>()
+  const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>(null)
   const [profiles, setProfiles] = useState<ProfileGet[]>()
 
   // TODO: Consider looking at Context way of changing state in a parent-child components.
@@ -41,11 +41,22 @@ const ProfileDashboard = () => {
     setForceTableKey(forceTableKey + 1)
   }
 
-  const [order, setOrder] = useState<string>('asc')
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [order, setOrder] = useState<string>('desc')
 
   const handleRequestSort = (event: React.MouseEvent<unknown>) => {
     const isAsc = order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   useEffect(() => {
@@ -144,14 +155,24 @@ const ProfileDashboard = () => {
     return 0;
   }
 
+  const getFilteredRows = () => {
+    return profiles.slice().filter((p) => profilesSkillTypeFilter === null || p.skillType === profilesSkillTypeFilter)
+  }
+
+  const emptyRows = profiles ? Math.max(0, (1 + page) * rowsPerPage - getFilteredRows().length) : rowsPerPage
+
   const visibleRows = React.useMemo(
     () => {
-      return (profiles ? profiles.slice().sort(
-        (a, b) => (order === 'desc' ? 1 : -1) * descendingComparator(a, b)) : []
+      return (
+        profiles
+          ? getFilteredRows()
+            .sort((a, b) => (order === 'desc' ? 1 : -1) * descendingComparator(a, b))
+            .slice(page * rowsPerPage, Math.min((page + 1) * rowsPerPage, profiles.length))
+          : []
       )
     },
-    [order, profiles],
-  );
+    [order, profiles, page, rowsPerPage, profilesSkillTypeFilter],
+  )
 
   return (
     <div>
@@ -167,7 +188,7 @@ const ProfileDashboard = () => {
           autoComplete
           size='small'
         />
-        <TableContainer component={Paper} sx={{ minHeight: 200, boxShadow: 'none' }}>
+        <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <EnhancedTableHead
               order={order}
@@ -175,15 +196,14 @@ const ProfileDashboard = () => {
             />
             <TableBody>
               {visibleRows && visibleRows.map((profile: ProfileGet) => {
-                if (profilesSkillTypeFilter !== null &&
-                  profilesSkillTypeFilter !== undefined &&
-                  profile.skillType !== profilesSkillTypeFilter) {
-                  return ''
-                }
+                // if (profilesSkillTypeFilter !== null &&
+                //   profile.skillType !== profilesSkillTypeFilter) {
+                //   return ''
+                // }
                 return (
                   <TableRow
                     key={profile.id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">{profile.userLogin}</TableCell>
                     <TableCell align="right">{profile.skillType}</TableCell>
@@ -197,7 +217,6 @@ const ProfileDashboard = () => {
                       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', padding: 0 }}>
                         <MButton onClick={async () => {
                           setProfileViewInputValues({
-                            scenario: ProfileViewScenario.View,
                             payload: await getProfileData(profile.id)
                           })
                           setProfileViewActive(true)
@@ -215,18 +234,27 @@ const ProfileDashboard = () => {
                   </TableRow>
                 )
               })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: 53 * emptyRows,
+                  }}
+                // sx={{ 'td, th': { border: 0 } }}
+                >
+                  <TableCell colSpan={7} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-          {/* TODO: Pagination is not working. */}
-          {/* <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={profiles ? profiles.length : 0}
-              rowsPerPage={profilesRowsPerPage}
-              page={profilesPage}
-              onPageChange={() => { setProfilesPage(profilesPage + 1) }}
-              onRowsPerPageChange={(e) => { setProfilesRowsPerPage(+e.target.value) }}
-          /> */}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={profiles ? getFilteredRows().length : 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </TableContainer>
         <Box sx={{ alignSelf: 'flex-end', paddingRight: 4 }}>
           <MButton onClick={() => { setProfileCreationActive(true); }}>Создать селф-ревью</MButton>
@@ -239,7 +267,6 @@ const ProfileDashboard = () => {
           }}
           nextFunc={async (profileId: string) => {
             setProfileViewInputValues({
-              scenario: ProfileViewScenario.View,
               payload: await getProfileData(profileId)
             })
             forceTableRefresh()
@@ -250,7 +277,10 @@ const ProfileDashboard = () => {
       {profileViewActive &&
         <ProfileView
           cancelFunc={() => { setProfileViewActive(false); }}
-          nextFunc={() => { setProfileViewActive(false); }}
+          nextFunc={() => {
+            setProfileViewActive(false)
+            forceTableRefresh()
+          }}
           inputValues={profileViewInputValues}
         />}
     </div>

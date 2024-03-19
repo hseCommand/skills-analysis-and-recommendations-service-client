@@ -17,13 +17,13 @@ export enum ProfileViewScenario {
 }
 
 export interface ProfileViewInputValues {
-  scenario: ProfileViewScenario,
+  // scenario: ProfileViewScenario,
   payload: ProfileGet,
 }
 
 const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   let inputValuesParsed: ProfileViewInputValues = inputValues as ProfileViewInputValues
-  let scenario: ProfileViewScenario = inputValuesParsed.scenario
+  let scenario: ProfileViewScenario = undefined
   let presetupData = inputValuesParsed.payload
 
   const [availableSkills, setAvailableSkills] = useState<SkillGet[]>()
@@ -143,10 +143,10 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
     }
   }
 
-  if (scenario === ProfileViewScenario.View &&
-    presetupData.userLogin === localStorage.getItem("name") &&
-    presetupData.status !== 'DONE' &&
-    presetupData.status !== 'ARCHIVE') {
+  if (presetupData.status === "DONE" ||
+    presetupData.status === "ARCHIVE") {
+    scenario = ProfileViewScenario.View
+  } else if (presetupData.userLogin === localStorage.getItem("name")) {
     scenario = ProfileViewScenario.Edit
   } else if (presetupData.userLogin !== localStorage.getItem("name")) {
     scenario = ProfileViewScenario.Approve
