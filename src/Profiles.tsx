@@ -5,6 +5,7 @@ import { Col, Modal, Button, Form, Container, Stack } from 'react-bootstrap';
 import Multiselect from 'multiselect-react-dropdown';
 
 import './style/App.css'
+import './style/skills.css'
 import ProfileDashboard from './profile/ProfileDashboard';
 
 function Profiles() {
@@ -236,7 +237,7 @@ function Profiles() {
                         <div className="slhTags">Теги</div>
                         <div></div>
                     </div>
-                    {skills.map((skill: any, i: number) => {
+                    {Array.isArray(skills) && skills.map((skill: any, i: number) => {
                         let tagsStr = ""
                         if (skill.tags.length > 0) {
                         tagsStr = skill.tags.at(0)
@@ -251,15 +252,15 @@ function Profiles() {
                             <div className="skillInfo" key={i}>
                                 <div className="skillTitle">{skill.name}</div>
                                 <div className="skillTags">{tagsStr}</div>
-                                <button className='openSkill' onClick={e => openBtnClicked(skill.id)}>открыть</button>
+                                <button className='openSkill' onClick={e => openBtnClicked(skill.id)}>Открыть</button>
                             </div>
                         )
                     })}
                 </div>
                 {roles.includes("ADMIN") &&
-                <button onClick={() => {
+                <button className="newSkillBtn" onClick={() => {
                 navigate("/addskill")
-                }}>добавить навык</button>}
+                }}>Добавить навык</button>}
             </div>
             }
 
