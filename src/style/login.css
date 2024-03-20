@@ -1,0 +1,13 @@
+.loginLabel {
+  margin-left: 4px;
+}
+
+.loginInput {
+  margin-top: 0;
+  margin-bottom: 32px;
+  border-radius: 4px;
+}
+
+.btn {
+  border-radius: 4px;
+}

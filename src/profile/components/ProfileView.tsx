@@ -33,6 +33,16 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
   const [forceSkillsKey, setForceSkillsKey] = useState<number>(0)
   const [profileComment, setProfileComment] = useState<string>('')
 
+  const getComment = () => {
+    if (scenario === ProfileViewScenario.Approve) {
+      return 'Комментарий'
+    } else if (scenario === ProfileViewScenario.Edit) {
+      return 'Будет доступно после оценки'
+    } else {
+      return 'Нет комментария'
+    }
+  }
+
   const forceSkillsRefresh = () => {
     setForceSkillsKey(forceSkillsKey + 1)
   }
@@ -191,7 +201,7 @@ const ProfileView = ({ cancelFunc, nextFunc, inputValues }: PopupProps) => {
                   </Stack>
                 </Box>
                 <TextField
-                  placeholder={scenario === ProfileViewScenario.Approve ? 'Комментарий' : 'Будет доступно после оценки'}
+                  placeholder={getComment()}
                   multiline
                   minRows={4}
                   maxRows={8}

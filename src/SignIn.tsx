@@ -2,13 +2,8 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Col, Button, Row, Container, Card, Form } from 'react-bootstrap';
-import { jwtDecode } from "jwt-decode";
-
-interface JwtPayload {
-    id: string,
-    name: string,
-    roles: []
-}
+import { login } from './api/login';
+import './style/login.css'
 
 function SignIn() {
     const [name, nameSet] = useState("")
@@ -17,53 +12,26 @@ function SignIn() {
 
     const navigate = useNavigate()
 
-    let login = () => {
-        fetch("http://localhost:8080/auth/token", {
-            method: "POST",
-            headers: {
-            'Accept': '*/*',
-            'Content-Type': 'application/json'
-            }, body: JSON.stringify({
-                name: name,
-                password: password
-            })
-        }).then(res=>res.text())
-          .then(response=>{
-            localStorage.setItem('token', response)
-            const decoded = jwtDecode<JwtPayload>(response);
-            localStorage.setItem('id', decoded.id)
-            localStorage.setItem('name', decoded.name)
-            localStorage.setItem('roles', JSON.stringify(decoded.roles))
-
-            navigate("/profiles")
-          })
-          .catch(er=>{
-            console.log(er.message)
-        })
-    }
-
     return(
         <div>
             <Container>
                 <Row className="vh-100 d-flex justify-content-center align-items-center">
-                <Col md={8} lg={6} xs={12}>
+                <Col md={8} lg={6} xl={4} xs={12}>
                     <Card className="px-4">
                     <Card.Body>
                         <div className="mb-3 mt-md-4">
-                        <h2 className="fw-bold mb-2 text-center ">
+                        <h2 className="fw-bold mb-3 text-center ">
                             Sign In
                         </h2>
                         <div className="mb-3">
                             <Form noValidate onSubmit={e => {
                                 e.preventDefault()
-                                login()
+                                login(name, password, navigate)
                             }}>
 
                             <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label className="text-center">
-                                    Name
-                                </Form.Label>
-                                <Form.Control type="email" placeholder="Enter name"
+                                <Form.Label className="loginLabel">Name</Form.Label>
+                                <Form.Control className="loginInput" type="email" placeholder="Enter name"
                                     onChange={a => nameSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -72,8 +40,8 @@ function SignIn() {
                                 className="mb-3"
                                 controlId="formBasicPassword"
                             >
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password"
+                                <Form.Label className="loginLabel">Password</Form.Label>
+                                <Form.Control className="loginInput" type="password" placeholder="Password"
                                     onChange={a => passwordSet(a.target.value)}
                                 />
                             </Form.Group>

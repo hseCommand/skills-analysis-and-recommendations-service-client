@@ -2,13 +2,8 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Col, Button, Row, Container, Card, Form } from 'react-bootstrap';
-import { jwtDecode } from "jwt-decode";
-
-interface JwtPayload {
-    id: string,
-    name: string,
-    // roles: []
-}
+import { login } from './api/login';
+import './style/login.css'
 
 function SignUp() {
     const [name, nameSet] = useState("")
@@ -50,33 +45,8 @@ function SignUp() {
           }
           ).then(response=>{
             if(response) {
-                login()
+                login(name, password, navigate)
             }
-          })
-          .catch(er=>{
-            console.log(er.message)
-        })
-    }
-
-    let login = () => {
-        fetch("http://localhost:8080/auth/token", {
-            method: "POST",
-            headers: {
-            'Accept': '*/*',
-            'Content-Type': 'application/json'
-            }, body: JSON.stringify({
-                name: name,
-                password: password
-            })
-        }).then(res=>res.text())
-          .then(response=>{
-            localStorage.setItem('token', response)
-            const decoded = jwtDecode<JwtPayload>(response);
-            localStorage.setItem('id', decoded.id)
-            localStorage.setItem('name', decoded.name)
-            // localStorage.setItem('roles', decoded.roles)
-
-            navigate("/profiles")
           })
           .catch(er=>{
             console.log(er.message)
@@ -87,11 +57,11 @@ function SignUp() {
         <div>
             <Container>
                 <Row className="vh-100 d-flex justify-content-center align-items-center">
-                <Col md={8} lg={6} xs={12}>
+                <Col md={8} lg={6} xl={4} xs={12}>
                     <Card className="px-4">
                     <Card.Body>
                         <div className="mb-3 mt-md-4">
-                        <h2 className="fw-bold mb-2 text-center ">
+                        <h2 className="fw-bold mb-3 text-center ">
                             Sign Up
                         </h2>
                         <div className="mb-3">
@@ -101,17 +71,15 @@ function SignUp() {
                                 // console.log(name, password, email)
                             }}>
                             <Form.Group className="mb-3" controlId="Name">
-                                <Form.Label className="text-center">Name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Name"
+                                <Form.Label className="loginLabel">Name</Form.Label>
+                                <Form.Control type="text" className="loginInput" placeholder="Enter Name"
                                     onChange={a => nameSet(a.target.value)}
                                 />
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label className="text-center">
-                                Email address
-                                </Form.Label>
-                                <Form.Control type="email" placeholder="Enter email"
+                                <Form.Label className="loginLabel">Email address</Form.Label>
+                                <Form.Control type="email" className="loginInput" placeholder="Enter email"
                                     onChange={a => emailSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -120,8 +88,8 @@ function SignUp() {
                                 className="mb-3"
                                 controlId="formBasicPassword"
                             >
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password"
+                                <Form.Label className="loginLabel">Password</Form.Label>
+                                <Form.Control type="password" className="loginInput" placeholder="Password"
                                     onChange={a => passwordSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -129,7 +97,7 @@ function SignUp() {
                                 className="mb-3"
                                 controlId="formBasicCheckbox"
                             ></Form.Group>
-                            <div className="d-grid">
+                            <div className="mt-2 d-grid">
                                 <Button variant="primary" type="submit">
                                     Create Account
                                 </Button>
@@ -144,7 +112,7 @@ function SignUp() {
                                     Sign In
                                 </a>
                             </p>
-                            <p>
+                            {/* <p>
                                 <Button variant="secondary" onClick={()=>{ navigate('/profiles') }} style={{marginTop: "20px"}}>
                                     Profiles page
                                 </Button>
@@ -154,7 +122,7 @@ function SignUp() {
                                 <Button variant="secondary" onClick={()=>{ navigate('/skills') }}>
                                     Skills page
                                 </Button>
-                            </p>
+                            </p> */}
                 
                             </div>
                         </div>

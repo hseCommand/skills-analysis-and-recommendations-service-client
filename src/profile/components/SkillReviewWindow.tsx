@@ -46,6 +46,16 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
   const [artifact, setArtifact] = useState<string>('')
   const [skillComment, setSkillComment] = useState<string>('')
 
+  const getComment = () => {
+    if (scenario === ProfileViewScenario.Approve) {
+      return 'Комментарий'
+    } else if (scenario === ProfileViewScenario.Edit) {
+      return 'Будет доступно после оценки'
+    } else {
+      return 'Нет комментария'
+    }
+  }
+
   // TODO: Consider using Suspense component to wait until data is fetched.
   if (!skillInfo) {
     return (
@@ -112,7 +122,7 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, appr
           currentData.skillComment = e.target.value
           setSkillComment(e.target.value)
         }}
-        placeholder={scenario === ProfileViewScenario.Approve ? 'Комментарий' : 'Будет доступно после оценки'}
+        placeholder={getComment()}
         multiline
         rows={4}
         InputProps={{
