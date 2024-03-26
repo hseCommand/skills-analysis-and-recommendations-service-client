@@ -6,14 +6,17 @@ import {
   Autocomplete,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { SkillReviewWindowProps } from './props';
+import { ProfileViewScenario } from './ProfileView';
 
-// TODO: Нужно ли переключение между навыками, не выключая предыдущего навыка (интуитивно понятно)?
-// Или сделать жесткое выполнение: не нажал cancel, save или next - не вышел (затемняя остальную область, чтобы не работала).
-const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, readOnly }: SkillReviewWindowProps) => {
+// Function saveDataFunc is now useless since initialData is passed by ref, 
+// so all data is saved automatically.
+// The only purpose it has now - refreshing outer skill list.
+const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, approveFunc, declineFunc, scenario }: SkillReviewWindowProps) => {
   let currentData = initialData;
   const [skillInfo, setSkillInfo] = useState<any>()
   let getSkillInfo = () => {
-    fetch("http://localhost:8080/skills/" + initialData.id, {
+    fetch("http://localhost:8080/skills/" + initialData.skillId, {
       method: "GET",
       headers: {
         'Accept': '*/*',
@@ -23,7 +26,6 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
     ).then(res => res.json())
       .then(response => {
         setSkillInfo(response)
-        console.log(response)
       })
       .catch(er => {
         console.log(er.message)
@@ -32,19 +34,29 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
 
   useEffect(() => {
     getSkillInfo()
-  }, [initialData.id])
+  }, [initialData.skillId])
 
   useEffect(() => {
-    setLevel(initialData.level)
+    setLevel(initialData.selfReviewGrade?.toString() || null)
     setArtifact(initialData.artifact)
-    setCommentary(initialData.commmentary)
-  }, [initialData.id])
+    setSkillComment(initialData.skillComment || '')
+  }, [initialData.skillId])
 
-  const [level, setLevel] = useState<number>(initialData.level)
-  const [artifact, setArtifact] = useState<string>(initialData.artifact)
-  const [commentary, setCommentary] = useState<string>(initialData.commmentary)
+  const [level, setLevel] = useState<string>(null)
+  const [artifact, setArtifact] = useState<string>('')
+  const [skillComment, setSkillComment] = useState<string>('')
 
-  {/* TODO: Consider using Suspense component to wait until data is fetched. */ }
+  const getComment = () => {
+    if (scenario === ProfileViewScenario.Approve) {
+      return 'Комментарий'
+    } else if (scenario === ProfileViewScenario.Edit) {
+      return 'Будет доступно после оценки'
+    } else {
+      return 'Нет комментария'
+    }
+  }
+
+  // TODO: Consider using Suspense component to wait until data is fetched.
   if (!skillInfo) {
     return (
       <Stack spacing={1} sx={{ width: 0, minWidth: 300, minHeight: 300, flexGrow: 6, padding: 2, alignSelf: "flex-start" }}>
@@ -59,14 +71,13 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
       </Box>
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Stack spacing={1} sx={{ flexGrow: 1, width: 0 }}>
-          {/* TODO: Целевой уровень - обработать ситуацию, когда у навыка нет такого уровня (взять лучший - ближайший) */}
-          <TextField value={'Целевой уровень: ' + initialData.targetLevel} disabled></TextField>
+          <TextField value={'Целевой уровень: ' + initialData.targetGrade} disabled></TextField>
           <TextField
             multiline
             disabled
             rows={4}
             sx={{ width: "100%" }}
-            value={skillInfo.skillGrades[initialData.targetLevel - 1].requirements}
+            value={skillInfo.skillGrades[initialData.targetGrade - 1].requirements}
           />
         </Stack>
         <Stack spacing={1} sx={{ flexGrow: 1, width: 0 }}>
@@ -74,21 +85,21 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
             disablePortal
             options={skillInfo.skillGrades.map((grade: any) => grade.gradeNumber.toString())}
             renderInput={(params) => <TextField {...params} label="Выбери свой уровень" />}
-            value={level == -1 ? '' : level.toString()}
+            value={level}
             onChange={(e, newValue) => {
-              setLevel(+newValue);
-              currentData.level = +newValue;
+              setLevel(newValue);
+              currentData.selfReviewGrade = newValue ? +newValue : null;
               saveDataFunc(currentData);
             }}
             autoHighlight
-            readOnly={readOnly}
+            readOnly={scenario !== ProfileViewScenario.Edit}
           />
           <TextField
             multiline
             disabled
             rows={4}
             sx={{ width: "100%" }}
-            value={level !== -1 ? skillInfo.skillGrades[level - 1].requirements : "..."}
+            value={level === null ? '...' : skillInfo.skillGrades[+level - 1].requirements}
           />
         </Stack>
       </Box>
@@ -102,27 +113,38 @@ const SkillReviewWindow = ({ initialData, saveDataFunc, prevFunc, nextFunc, read
         multiline
         rows={4}
         InputProps={{
-          readOnly: readOnly,
+          readOnly: scenario !== ProfileViewScenario.Edit,
         }}
       />
       <TextField
-        value={commentary}
+        value={skillComment}
         onChange={(e) => {
-          currentData.commmentary = e.target.value
-          setCommentary(e.target.value)
+          currentData.skillComment = e.target.value
+          setSkillComment(e.target.value)
         }}
-        placeholder='Комментарий'
+        placeholder={getComment()}
         multiline
         rows={4}
         InputProps={{
-          readOnly: readOnly,
+          readOnly: scenario !== ProfileViewScenario.Approve,
         }}
       />
       <Box sx={{ display: "flex", flexDirection: "row", columnGap: 2 }}>
         <Button sx={{ mr: "auto" }} onClick={prevFunc}>Назад</Button>
-        {/* TODO: Fix saveDataFunc - retrieve data from input fields. */}
-        {!readOnly &&
+        {scenario === ProfileViewScenario.Edit &&
           <Button onClick={() => { saveDataFunc(currentData); }}>Сохранить</Button>
+        }
+        {scenario === ProfileViewScenario.Approve &&
+          <Box sx={{ mr: 'auto', display: 'flex', flexDirection: 'row', columnGap: 1 }}>
+            <Button sx={{ bgcolor: '#f0fff0', borderRadius: 0 }}
+              onClick={() => { currentData.isApprove = true; approveFunc(currentData); }}>
+              Подтвердить
+            </Button>
+            <Button sx={{ bgcolor: '#fff0f0', borderRadius: 0 }}
+              onClick={() => { currentData.isApprove = false; declineFunc(currentData); }}>
+              Отклонить
+            </Button>
+          </Box>
         }
         <Button onClick={nextFunc}>Далее</Button>
       </Box>

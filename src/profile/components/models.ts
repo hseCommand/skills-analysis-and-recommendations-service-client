@@ -1,55 +1,34 @@
-interface SkillProps {
-  name: string;
-  onClick: () => void;
-  targetLevel: number;
-  level: number;
-}
-
-interface SkillReviewWindowProps {
-  initialData: InitialDataSkillReview;
-  saveDataFunc: (data: InitialDataSkillReview) => void;
-  prevFunc: () => void;
-  nextFunc: () => void;
-  readOnly: boolean;
-}
-
-interface InitialDataSkillReview {
-  id: number;
-  targetLevel: number;
-  level: number;
-  artifact: string;
-  commmentary: string;
-}
-
-interface ProfilePresetupReturn {
-  skillType: string;
-  unitType: string;
-  tags: string[];
-  targetGradeByDefault: number;
-}
-
-interface PopupProps {
-  cancelFunc: () => void;
-  nextFunc?: (outputValues?: any) => void;
-  inputValues?: any;
+interface SkillReview {
+  skillId: number,
+  artifact: string,
+  targetGrade: number,
+  selfReviewGrade: number,
+  isApprove: boolean,
+  skillComment: string,
 }
 
 interface ProfileGet {
   id: string,
+  userLogin: string,
   createdAt: string,
   status: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
+  profileComment: string,
   skills: {
     skillId: number,
     artifact: string,
     targetGrade: number,
-  }[]
+    selfReviewGrade: number,
+    isApprove: boolean,
+    skillComment: string,
+  }[],
 }
 
 interface ProfileCreate {
   status: string,
+  userLogin: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
@@ -62,16 +41,21 @@ interface ProfileCreate {
 
 interface ProfileEdit {
   id: string,
+  userLogin: string,
   createdAt: string,
   status: string,
   skillType: string,
   unitType: string,
   targetGradeByDefault: number,
+  profileComment: string,
   skills: {
     skillId: number,
     artifact: string,
-    targetGrade: number
-  }[]
+    targetGrade: number,
+    selfReviewGrade: number,
+    isApprove: boolean,
+    skillComment: string,
+  }[],
 }
 
 interface ProfileMenuListActions {
@@ -85,20 +69,6 @@ interface ProfileMenuListActions {
 //   IN_PROGRESS,
 //   ARCHIVE,
 // }
-
-interface ExistingProfileData {
-  id: string,
-  createdAt: string,
-  status: string,
-  skillType: string,
-  unitType: string,
-  targetGradeByDefault: number,
-  skills: {
-    skillId: number,
-    artifact: string,
-    targetGrade: number,
-  }[]
-}
 
 interface SkillGet {
   id: number,
@@ -115,4 +85,14 @@ interface SkillGet {
       recommendation: string,
     }
   ]
+}
+
+interface ApprovePost {
+  profileId: string,
+  profileComment: string,
+  reviewSkills: {
+    skillId: number,
+    isApprove: boolean,
+    skillComment: string
+  }[]
 }

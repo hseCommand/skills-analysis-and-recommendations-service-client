@@ -13,21 +13,21 @@ import {
   TextField,
   Button as MButton,
   TablePagination,
+  TableSortLabel,
 } from '@mui/material';
-import GeneralProfileCreationComponent from './GeneralProfileCreationComponent';
 import ProfileMenuList from './components/ProfileMenuList';
 import ProfileView, { ProfileViewInputValues, ProfileViewScenario } from './components/ProfileView';
 import { getAllSkillTypes } from './api/skills';
+import ProfilePresetup from './components/ProfilePresetup';
 import { useNavigate } from 'react-router-dom';
 
-
 const ProfileDashboard = () => {
-  
+
   const navigate = useNavigate()
   // TODO: Wouldn't filtering inside table headers be better?
   const [skillTypesSelectLabels, setSkillTypesSelectLabels] = useState<string[]>([])
-  const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>()
-  const [profiles, setProfiles] = useState<any>()
+  const [profilesSkillTypeFilter, setProfilesSkillTypeFilter] = useState<string>(null)
+  const [profiles, setProfiles] = useState<ProfileGet[]>()
 
   // TODO: Consider looking at Context way of changing state in a parent-child components.
   const [profileCreationActive, setProfileCreationActive] = useState<boolean>(false)
@@ -41,12 +41,30 @@ const ProfileDashboard = () => {
     setForceTableKey(forceTableKey + 1)
   }
 
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [order, setOrder] = useState<string>('desc')
+
+  const handleRequestSort = (event: React.MouseEvent<unknown>) => {
+    const isAsc = order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   useEffect(() => {
     getAllSkillTypes().then((skillTypes) => { setSkillTypesSelectLabels(skillTypes) })
   }, [])
 
   useEffect(() => {
-    
+
     fetch("http://localhost:8080/profiles/all", {
       method: "GET",
       headers: {
@@ -71,7 +89,7 @@ const ProfileDashboard = () => {
   }, [forceTableKey])
 
   async function deleteProfile(id: string): Promise<void> {
-    fetch("http://localhost:8080/profiles/" + id, {
+    return await fetch("http://localhost:8080/profiles/" + id, {
       method: "DELETE",
       headers: {
         'Accept': '*/*',
@@ -88,8 +106,8 @@ const ProfileDashboard = () => {
 
   async function archiveProfile(profile: ProfileEdit): Promise<void> {
     profile.status = "ARCHIVE"
-    
-    await fetch("http://localhost:8080/profiles", {
+
+    return await fetch("http://localhost:8080/profiles", {
       method: "PUT",
       body: JSON.stringify(profile),
       headers: {
@@ -125,9 +143,40 @@ const ProfileDashboard = () => {
       })
   }
 
+  function descendingComparator(a: ProfileGet, b: ProfileGet) {
+    let aDate = Date.parse(a.createdAt)
+    let bDate = Date.parse(b.createdAt)
+    if (bDate < aDate) {
+      return -1;
+    }
+    if (bDate > aDate) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const getFilteredRows = () => {
+    return profiles.slice().filter((p) => profilesSkillTypeFilter === null || p.skillType === profilesSkillTypeFilter)
+  }
+
+  const emptyRows = profiles ? Math.max(0, (1 + page) * rowsPerPage - getFilteredRows().length) : rowsPerPage
+
+  const visibleRows = React.useMemo(
+    () => {
+      return (
+        profiles
+          ? getFilteredRows()
+            .sort((a, b) => (order === 'desc' ? 1 : -1) * descendingComparator(a, b))
+            .slice(page * rowsPerPage, Math.min((page + 1) * rowsPerPage, profiles.length))
+          : []
+      )
+    },
+    [order, profiles, page, rowsPerPage, profilesSkillTypeFilter],
+  )
+
   return (
     <div>
-      <MStack key={forceTableKey} spacing={2} sx={{ marginY: 4, marginX: 2 }}>
+      <MStack key={forceTableKey} spacing={2} sx={{ paddingY: 4, paddingX: 2 }} className="containerUnderTabs">
         <Autocomplete
           sx={{ paddingLeft: 2, maxWidth: 350 }}
           disablePortal
@@ -139,35 +188,24 @@ const ProfileDashboard = () => {
           autoComplete
           size='small'
         />
-        <TableContainer component={Paper} sx={{ minHeight: 200, boxShadow: 'none' }}>
+        <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Название команды / ФИО</TableCell>
-                <TableCell align="right">Тип навыка</TableCell>
-                <TableCell align="right">Тип Юнита</TableCell>
-                {/* TODO: Add table sorting by clicking on the datetime header */}
-                <TableCell align="right">Дата заполнения</TableCell>
-                <TableCell align="right">Уровень</TableCell>
-                <TableCell align="right">Статус</TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow>
-            </TableHead>
+            <EnhancedTableHead
+              order={order}
+              onRequestSort={handleRequestSort}
+            />
             <TableBody>
-              {profiles && profiles.map((profile: ProfileGet) => {
-                if (profilesSkillTypeFilter !== null &&
-                  profilesSkillTypeFilter !== undefined &&
-                  profile.skillType !== profilesSkillTypeFilter) {
-                  return ''
-                }
+              {visibleRows && visibleRows.map((profile: ProfileGet) => {
+                // if (profilesSkillTypeFilter !== null &&
+                //   profile.skillType !== profilesSkillTypeFilter) {
+                //   return ''
+                // }
                 return (
                   <TableRow
                     key={profile.id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell component="th" scope="row">
-                      {'???'}
-                    </TableCell>
+                    <TableCell component="th" scope="row">{profile.userLogin}</TableCell>
                     <TableCell align="right">{profile.skillType}</TableCell>
                     <TableCell align="right">{profile.unitType}</TableCell>
                     <TableCell align="right">{profile.createdAt}</TableCell>
@@ -179,7 +217,6 @@ const ProfileDashboard = () => {
                       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', padding: 0 }}>
                         <MButton onClick={async () => {
                           setProfileViewInputValues({
-                            scenario: ProfileViewScenario.View,
                             payload: await getProfileData(profile.id)
                           })
                           setProfileViewActive(true)
@@ -197,39 +234,92 @@ const ProfileDashboard = () => {
                   </TableRow>
                 )
               })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: 53 * emptyRows,
+                  }}
+                // sx={{ 'td, th': { border: 0 } }}
+                >
+                  <TableCell colSpan={7} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-          {/* TODO: Pagination is not working. */}
-          {/* <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={profiles ? profiles.length : 0}
-                            rowsPerPage={profilesRowsPerPage}
-                            page={profilesPage}
-                            onPageChange={() => { setProfilesPage(profilesPage + 1) }}
-                            onRowsPerPageChange={(e) => { setProfilesRowsPerPage(+e.target.value) }}
-                        /> */}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={profiles ? getFilteredRows().length : 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </TableContainer>
         <Box sx={{ alignSelf: 'flex-end', paddingRight: 4 }}>
           <MButton onClick={() => { setProfileCreationActive(true); }}>Создать селф-ревью</MButton>
         </Box>
       </MStack>
-      {
-        profileCreationActive ?
-          <GeneralProfileCreationComponent cancelFunc={() => {
-            setProfileCreationActive(false);
+      {profileCreationActive &&
+        <ProfilePresetup
+          cancelFunc={() => {
+            setProfileCreationActive(false)
+          }}
+          nextFunc={async (profileId: string) => {
+            setProfileViewInputValues({
+              payload: await getProfileData(profileId)
+            })
             forceTableRefresh()
-          }} />
-          : ""
-      }
-      {/* TODO: Remove hardcoded values. */}
+            setProfileCreationActive(false)
+            setProfileViewActive(true)
+          }}
+        />}
       {profileViewActive &&
         <ProfileView
           cancelFunc={() => { setProfileViewActive(false); }}
-          nextFunc={() => { setProfileViewActive(false); }}
+          nextFunc={() => {
+            setProfileViewActive(false)
+            forceTableRefresh()
+          }}
           inputValues={profileViewInputValues}
         />}
     </div>
+  )
+}
+
+interface EnhancedTableHeadProps {
+  order: any,
+  onRequestSort: any,
+}
+
+const EnhancedTableHead = ({ order, onRequestSort }: EnhancedTableHeadProps) => {
+  const createSortHandler = () => (event: React.MouseEvent<unknown>) => {
+    onRequestSort(event);
+  };
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell>Название команды / ФИО</TableCell>
+        <TableCell align="right">Тип навыка</TableCell>
+        <TableCell align="right">Тип Юнита</TableCell>
+        <TableCell
+          align="right"
+          sortDirection={order}
+        >
+          <TableSortLabel
+            active={true}
+            direction={order}
+            onClick={createSortHandler()}
+          >
+            Дата заполнения
+          </TableSortLabel>
+        </TableCell>
+        <TableCell align="right">Уровень</TableCell>
+        <TableCell align="right">Статус</TableCell>
+        <TableCell align="right"></TableCell>
+      </TableRow>
+    </TableHead>
   )
 }
 

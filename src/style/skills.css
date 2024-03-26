@@ -1,0 +1,84 @@
+.skillnameSearch, .skillnameInput {
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 8.5px 4px 8.5px 14px;
+  margin-top: 32px;
+}
+
+.reqLevel, .artefactLevel, .recomLevel {
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 8.5px 4px 8.5px 14px;
+  margin-top: 16px;
+}
+
+input:hover, select:hover, .searchWrapper:hover {
+  border-color: rgb(33, 33, 33);
+}
+
+input:focus, select:focus, .searchWrapper:focus {
+  outline: rgb(62, 112, 204) solid 1px;
+  border-color: rgb(62, 112, 204);
+}
+
+.selection, .searchWrapper {
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  padding: 6.5px 4px 8.5px 10px;
+  color: rgb(102, 102, 102);
+}
+
+.searchWrapper {
+  display: flex;
+}
+
+button {
+  padding: 6px 8px;
+  color: rgb(25, 118, 210);
+  background-color: transparent;
+  border: none;
+}
+
+.searchBtn {
+  margin-top: 8px;
+}
+
+.skillsList {
+  margin-top: 24px;
+  padding: 0 16px;
+}
+
+.skillsListHead {
+  margin-top: 0;
+  border-bottom: 1px solid rgb(224, 224, 224);
+  padding: 16px;
+  width: 100%;
+}
+
+.skillInfo {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgb(224, 224, 224);
+}
+
+.newSkillBtn {
+  margin-top: 16px;
+  margin-left: 32px;
+}
+
+.openSkill {
+  padding: 0 8px;
+}
+
+.addSkillBtns {
+  border-bottom: 1px solid lightgray;
+}
+
+.resetBtn {
+  color: rgb(116, 116, 116);
+  padding-left: 40px;
+}
+
+.deleteBtn {
+  color: red;
+}
