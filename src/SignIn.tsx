@@ -21,7 +21,7 @@ function SignIn() {
                     <Card.Body>
                         <div className="mb-3 mt-md-4">
                         <h2 className="fw-bold mb-3 text-center ">
-                            Sign In
+                            Вход
                         </h2>
                         <div className="mb-3">
                             <Form noValidate onSubmit={e => {
@@ -30,8 +30,8 @@ function SignIn() {
                             }}>
 
                             <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label className="loginLabel">Name</Form.Label>
-                                <Form.Control className="loginInput" type="email" placeholder="Enter name"
+                                <Form.Label className="loginLabel">Логин</Form.Label>
+                                <Form.Control className="loginInput" type="email" placeholder="Введите логин"
                                     onChange={a => nameSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -40,8 +40,8 @@ function SignIn() {
                                 className="mb-3"
                                 controlId="formBasicPassword"
                             >
-                                <Form.Label className="loginLabel">Password</Form.Label>
-                                <Form.Control className="loginInput" type="password" placeholder="Password"
+                                <Form.Label className="loginLabel">Пароль</Form.Label>
+                                <Form.Control className="loginInput" type="password" placeholder="Введите пароль"
                                     onChange={a => passwordSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -51,17 +51,17 @@ function SignIn() {
                             ></Form.Group>
                             <div className="d-grid">
                                 <Button variant="primary" type="submit">
-                                    Sign in
+                                    Войти
                                 </Button>
                             </div>
                             </Form>
                             <div className="mt-3">
                             <p className="mb-0  text-center">
-                                Don't have an account?{' '}
+                                Еще нет аккаунта?{' '}
                                 <a onClick={()=>{
                                     navigate('/')
                                 }} className="text-primary fw-bold" style={{cursor: "pointer"}}>
-                                    Sign Up
+                                    Зарегистрироваться
                                 </a>
                             </p>
                             </div>

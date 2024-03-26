@@ -62,7 +62,7 @@ function SignUp() {
                     <Card.Body>
                         <div className="mb-3 mt-md-4">
                         <h2 className="fw-bold mb-3 text-center ">
-                            Sign Up
+                            Регистрация
                         </h2>
                         <div className="mb-3">
                             <Form noValidate onSubmit={e => {
@@ -71,15 +71,15 @@ function SignUp() {
                                 // console.log(name, password, email)
                             }}>
                             <Form.Group className="mb-3" controlId="Name">
-                                <Form.Label className="loginLabel">Name</Form.Label>
-                                <Form.Control type="text" className="loginInput" placeholder="Enter Name"
+                                <Form.Label className="loginLabel">Логин</Form.Label>
+                                <Form.Control type="text" className="loginInput" placeholder="Введите логин"
                                     onChange={a => nameSet(a.target.value)}
                                 />
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label className="loginLabel">Email address</Form.Label>
-                                <Form.Control type="email" className="loginInput" placeholder="Enter email"
+                                <Form.Label className="loginLabel">Адрес электронной почты</Form.Label>
+                                <Form.Control type="email" className="loginInput" placeholder="Введите email"
                                     onChange={a => emailSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -88,8 +88,8 @@ function SignUp() {
                                 className="mb-3"
                                 controlId="formBasicPassword"
                             >
-                                <Form.Label className="loginLabel">Password</Form.Label>
-                                <Form.Control type="password" className="loginInput" placeholder="Password"
+                                <Form.Label className="loginLabel">Пароль</Form.Label>
+                                <Form.Control type="password" className="loginInput" placeholder="Введите пароль"
                                     onChange={a => passwordSet(a.target.value)}
                                 />
                             </Form.Group>
@@ -99,30 +99,19 @@ function SignUp() {
                             ></Form.Group>
                             <div className="mt-2 d-grid">
                                 <Button variant="primary" type="submit">
-                                    Create Account
+                                    Создать аккаунт
                                 </Button>
                             </div>
                             </Form>
                             <div className="mt-3">
                             <p className="mb-0  text-center">
-                                Already have an account?{' '}
+                                Уже есть аккаунт?{' '}
                                 <a onClick={()=>{
                                     navigate('/signin')
                                 }} className="text-primary fw-bold" style={{cursor: "pointer"}}>
-                                    Sign In
+                                    Войти
                                 </a>
                             </p>
-                            {/* <p>
-                                <Button variant="secondary" onClick={()=>{ navigate('/profiles') }} style={{marginTop: "20px"}}>
-                                    Profiles page
-                                </Button>
-                            </p>
-
-                            <p>
-                                <Button variant="secondary" onClick={()=>{ navigate('/skills') }}>
-                                    Skills page
-                                </Button>
-                            </p> */}
                 
                             </div>
                         </div>

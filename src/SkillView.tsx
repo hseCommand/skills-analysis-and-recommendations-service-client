@@ -188,7 +188,6 @@ function SkillView() {
               method: "DELETE",
               headers: {
                 'Accept': '*/*',
-                // 'Content-Type': 'application/json',
                 'Authorization': localStorage.getItem('token')
               },
           })

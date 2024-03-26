@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Col, Modal, Button, Form, Container, Stack } from 'react-bootstrap';
+import { Col, Modal, Button, Form, Container, Stack, Dropdown } from 'react-bootstrap';
 import Multiselect from 'multiselect-react-dropdown';
 
 import './style/App.css'
@@ -147,16 +147,35 @@ function Profiles() {
           if(response) {
               skillsFound = response
               console.log(skillsFound);
-              skillsSet(skillsFound)
 
+              let newskillsFound = skillsFound.filter(s => s.name.toLowerCase().includes(skillname.toLowerCase()))
+              console.log("found",newskillsFound);
+              
+              skillsSet(newskillsFound)
           }
         })
         .catch(er=>{
           console.log(er.message)
       })
-    //   let newskillsFound = skillsFound.filter(skill => skill.name.includes(skillname))
-    //   console.log("found",newskillsFound);
       
+    }
+
+    let resetBtnClicked = () => {
+        nameSkillSet("")
+        currentSkillTypeSet("")
+        currentUnitTypeSet("")
+        tagsSelectedSet([])
+        skillsSet(allSkills)
+    }
+
+    let nameOnHover = () => {
+        return(
+            <Button className="headerItem exitButtonHeader" style={{display: "block", position: "absolute"}}
+            onClick={() => {
+                localStorage.clear()
+                navigate("/")
+            }}>Выйти</Button>
+        )
     }
 
     return (
@@ -178,13 +197,19 @@ function Profiles() {
                 <div className="username">{name}</div>
             </div> */}
 
+            
             <div className="profileHeader">
-                <div className="headerItem">{name}</div>
-                <div className="headerItem">/</div>
-                <Button className="headerItem exitButtonHeader" onClick={() => {
+            <Dropdown>
+                <Dropdown.Toggle id="dropdown-basic" className='name-dropdown'>
+                    {name}
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => {
                     localStorage.clear()
-                    navigate("/")
-                }}>Выйти</Button>
+                    navigate("/")}}>Выйти</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
             </div>
 
             <div className="profileBtns">
@@ -200,7 +225,7 @@ function Profiles() {
                     <input className='skillnameSearch' placeholder='Поиск по названию навыка'
                     value={nameSkill} onChange={e => nameSkillSet(e.target.value)}></input>
                     <div className="optionsRow">
-                        <select className='selection skilltype' defaultValue="" 
+                        <select className='selection skilltype' value={currentSkillType}
                             onChange={e => currentSkillTypeSet(e.target.value)}>
                                 <option hidden value="">Тип навыка</option>
                                 {skillTypes.map((option: any, i: number) => {
@@ -210,7 +235,7 @@ function Profiles() {
                                     </option>
                                 )})}
                         </select>
-                        <select className='selection unittype' defaultValue="" 
+                        <select className='selection unittype' value={currentUnitType}
                             onChange={e => currentUnitTypeSet(e.target.value)}>
                                 <option hidden value="">Тип юнита</option>
                                 {unitTypes.map((option: any, i: number) => {
@@ -230,6 +255,9 @@ function Profiles() {
                     <button className='searchBtn' 
                     onClick={e => searchBtnClicked(nameSkill, currentSkillType, currentUnitType, tagsSelected)}>
                         Найти</button>
+                        <button className='resetBtn' 
+                    onClick={e => resetBtnClicked()}>
+                        Сбросить</button>
                 </div>
                 <div className="skillsList">
                     <div className="skillsListHead">
@@ -269,47 +297,6 @@ function Profiles() {
                 <ProfileDashboard />
             </div>
             }
-            {/* <Modal.Dialog>
-                <Modal.Header closeButton>
-                <Modal.Title>Profiles page</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body>
-                    <Form noValidate onSubmit={e => {
-                                e.preventDefault()
-                                // console.log(name, password, email)
-                            }}>
-                            <Form.Group className="mb-3" controlId="Name">
-                                <Form.Label className="text-center">Name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Name"
-                                    onChange={a => {}}
-                                />
-                            </Form.Group>
-                            
-                            <Form.Label className="text-center">Unit type</Form.Label>
-                            <Form.Select aria-label="Default select example">
-                                <option value="1">DEVELOPER</option>
-                                <option value="2">UNIT</option>
-                                <option value="3">TESTER</option>
-                                <option value="4">ANALYST</option>
-                            </Form.Select>
-                            <p></p>
-                            
-                            <Form.Label className="text-center">Skill type</Form.Label>
-                            <Form.Select aria-label="Default select example">
-                                <option value="1">EMPLOYEE</option>
-                                <option value="2">TEAM</option>
-                            </Form.Select>
-                    </Form>
-                </Modal.Body>
-
-                <Modal.Footer>
-                <Button variant="secondary" onClick={()=>{ navigate('/') }}>
-                    Close
-                </Button>
-                {/* <Button variant="primary">Save changes</Button> *
-                </Modal.Footer>
-            </Modal.Dialog> */}
             </div>
             
         </>

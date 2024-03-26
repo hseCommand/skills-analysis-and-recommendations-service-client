@@ -104,13 +104,11 @@ p {
 .slhTitle {
     padding-left: 15px;
     width: 300px;
-    font-weight: bold;
 }
 
 .slhTags {
     padding-right: 15px;
     width: 550px;
-    font-weight: bold;
 }
 
 .skillInfo {
@@ -200,4 +198,10 @@ input {
 td {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+}
+
+.name-dropdown {
+    background-color: white;
+    border: none;
+    color: black;
 }
