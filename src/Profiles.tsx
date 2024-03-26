@@ -127,12 +127,14 @@ function Profiles() {
     let searchBtnClicked = (skillname: any, type: any, unit: any, tags: any[]) => {
         let searchTags: any[] = []
         tagsSelected.forEach(t => searchTags.push(t.name))
+        let searchType = type == "" ? skillTypes : [type]
+        let searchUnit = unit == "" ? unitTypes : [unit]
         let skillsFound: any[] = []
         fetch("http://localhost:8080/skills/filter", {
             method: "POST",
             body: JSON.stringify({
-                "skillTypes": [type],
-                "unitTypes": [unit],
+                "skillTypes": searchType,
+                "unitTypes": searchUnit,
                 "tags": searchTags
 
             }),
